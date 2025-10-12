@@ -172,6 +172,40 @@ Second research direction - explore macroscopic coherence of spin network states
 
 ```bash
 python src/02_coherence_mechanism/coherence_analysis.py --num_nodes 1000 --temperature 1e-6
+
+## Validation & Demos
+
+You can reproduce the key numerical claims with the included demos:
+
+1) Energy scaling and context
+
+```bash
+python examples/energy_comparison_tables.py
+```
+
+Highlights:
+- For r = 10 m and a 10^24 reduction, E ≈ 2.02×10^20 J ≈ 48,000–50,000 megatons TNT
+- Linear scaling E ∝ r, derived from ρ ≈ (c^4/8πG) R with R ~ 1/r^2
+
+2) Effective coupling via coarse-graining (Direction #1)
+
+```bash
+python examples/demo_coarse_graining.py
+```
+
+Highlights at L = 1 m:
+- No coherence: f_eff ≈ 6.5×10^-53 → reduction ≈ 1.5×10^52×
+- Full coherence: f_eff ≈ 1.0 → reduction ≈ 1× (classical)
+
+3) Spin-network coherence dynamics (Direction #2)
+
+```bash
+python examples/demo_spin_network_evolution.py
+```
+
+Highlights:
+- Demonstrates unitary evolution and a simplified decoherence model
+- Next step: upgrade to density-matrix (Lindblad) evolution to quantify purity loss
 ```
 
 ## Critical Open Questions
