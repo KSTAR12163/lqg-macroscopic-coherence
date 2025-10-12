@@ -23,9 +23,9 @@ This repository tackles the **five critical research directions** needed to tran
 
 **Target**: Derive explicit reduction factor $f_{\text{eff}}$ 
 such that:
-$$
+```math
 \rho_{\text{effective}} = f_{\text{eff}} \cdot \frac{c^4}{8\pi G} \cdot R
-$$
+```
 
 ### 2. Macroscopic Coherence Mechanism
 **Goal**: Identify how to lock many Planck-scale polymer degrees of freedom into a single coherent state.
@@ -34,17 +34,29 @@ $$
 
 **Target**: Mechanism where $N$ Planck-scale corrections add constructively: $A_{\text{total}} \propto N \cdot A_{\text{single}}$ not $\propto \sqrt{N}$.
 
-### 3. Critical/Resonant Effects
+### 3. Critical/Resonant Effects **[IMPLEMENTED ✅]**
 **Goal**: Find phase transitions or critical points where small control input produces large macroscopic geometric response.
 
-**Approach**: Search for quantum geometric phase transitions, resonances in volume operator spectrum.
+**Approach**: Search for quantum geometric phase transitions, resonances in volume operator spectrum, avoided crossings in energy level structure.
+
+**Implementation**: `src/03_critical_effects/resonance_search.py`
+- Geometric Hamiltonian construction
+- Parameter sweep capabilities (polymer scale μ, external fields)
+- Avoided crossing detection
+- Spaghetti diagrams and susceptibility analysis
 
 **Target**: Identify control parameters where $\partial R / \partial \text{control} \gg 1$ (geometric amplification).
 
-### 4. Coupling Engineering (Impedance Matching)
+### 4. Coupling Engineering (Impedance Matching) **[IMPLEMENTED ✅]**
 **Goal**: Identify materials or field configurations that couple strongly to polymer-modified quantum geometry.
 
-**Approach**: Systematic survey of matter-geometry coupling in polymerized LQG.
+**Approach**: Systematic survey of matter-geometry coupling in polymerized LQG, impedance matching analysis.
+
+**Implementation**: `src/04_coupling_engineering/matter_coupling.py`
+- Matter field types (EM, scalar, fermionic, phonon, plasma)
+- Interaction Hamiltonian: $H_{int} = \lambda O_{geom} \otimes O_{matter}$
+- Transition rate calculations (Fermi's golden rule)
+- Optimal coupling search and impedance matching
 
 **Target**: Materials/fields with large coupling constant $\lambda_{\text{matter-geometry}}$ to quantum spacetime.
 
@@ -79,18 +91,29 @@ lqg-macroscopic-coherence/
 ├── src/
 │   ├── 01_effective_coupling/       # Derive f_eff from coarse-graining
 │   ├── 02_coherence_mechanism/      # Macroscopic quantum coherence theory
-│   ├── 03_critical_effects/         # Phase transitions and resonances
-│   ├── 04_coupling_engineering/     # Matter-geometry coupling
+│   ├── 03_critical_effects/         # ✅ Phase transitions and resonances
+│   ├── 04_coupling_engineering/     # ✅ Matter-geometry coupling
 │   ├── 05_parameter_sweep/          # Comprehensive parameter exploration
-│   └── core/                        # Shared mathematical infrastructure
+│   └── core/                        # Shared mathematical infrastructure (SymPy Wigner symbols)
 ├── docs/
 │   ├── theoretical_foundation.md    # Mathematical framework
 │   ├── energy_scaling_analysis.md   # Energy vs. curvature relationship
-│   └── research_roadmap.md          # Development plan
+│   ├── research_roadmap.md          # Development plan
+│   └── IMPLEMENTATION_STATUS.md     # ✅ NEW: Detailed implementation status
 ├── examples/
-│   └── energy_comparison_tables.py  # Reproduce energy scaling tables
+│   ├── energy_comparison_tables.py  # Reproduce energy scaling tables
+│   ├── demo_coarse_graining.py      # Direction #1 demonstration
+│   ├── demo_spin_network_evolution.py # Direction #2 demonstration
+│   ├── demo_resonance_search.py     # ✅ NEW: Direction #3 demonstration
+│   └── demo_coupling_engineering.py # ✅ NEW: Direction #4 demonstration
 ├── tests/
 │   └── validation/                  # UQ and sensitivity tests
+├── outputs/                         # Generated plots and data
+│   ├── spaghetti_diagram.png        # ✅ Energy level structure
+│   ├── susceptibility.png           # ✅ Response analysis
+│   ├── coupling_comparison.png      # ✅ Optimal couplings
+│   └── impedance_matching.png       # ✅ Transmission/reflection
+├── BUG_FIXES.md                     # ✅ Documented bug fixes
 └── README.md
 ```
 
@@ -111,12 +134,12 @@ mkdir -p outputs
 
 ### Running Demonstrations
 
-#### 1. Coarse-Graining and f_eff Derivation (Research Direction #1)
+#### 1. Effective Coupling Derivation (Research Direction #1)
 
 Demonstrates how polymer corrections renormalize from Planck to macroscopic scale:
 
 ```bash
-python examples/demo_coarse_graining.py
+python examples/demo_effective_coupling.py
 ```
 
 **Output**: 
@@ -125,21 +148,69 @@ python examples/demo_coarse_graining.py
 - Generates plots showing how coherence affects energy reduction
 - **Key finding**: Without macroscopic coherence, f_eff ~ 10^-53 at 1m scale (enormous reduction but insufficient). With full coherence, f_eff ~ 1 (no reduction). Need additional mechanisms.
 
-#### 2. Spin Network Evolution and Coherence (Research Direction #2)
+#### 2. Coherence Evolution and Decoherence (Research Direction #2)
 
 Simulates quantum evolution of spin network states to understand decoherence:
 
 ```bash
-python examples/demo_spin_network_evolution.py
+python examples/demo_coherence.py
 ```
 
 **Output**:
-- Simulates 4-node spin network evolution
-- Compares evolution with different decoherence rates
-- Generates plots of purity, entropy, and coherence time
-- **Key finding**: Coherence time τ_coh ∝ 1/γ sets the timescale for quantum geometric effects. Need mechanisms to suppress γ (topological protection, symmetries).
+- Simulates 4-node spin network evolution using density matrices
+- Compares evolution with different decoherence rates (γ)
+- Generates plots of purity, entropy, and coherence decay
+- **Key findings**: 
+  - **Bug fixed**: Decoherence now properly reduces purity (1.0 → 0.99 for γ=0.001)
+  - Coherence time τ_coh ∝ 1/γ sets timescale for quantum geometric effects
+  - Need mechanisms to suppress γ (topological protection, symmetries)
 
-#### 3. Energy Scaling Tables (Original Analysis)
+#### 3. Resonance Search (Research Direction #3) **[NEW ✅]**
+
+Searches for avoided crossings and resonances in quantum geometric spectrum:
+
+```bash
+python examples/demo_resonance_search.py
+```
+
+**Output**:
+- Performs parameter sweep over polymer scale μ
+- Detects avoided crossings in energy level structure
+- Generates spaghetti diagrams (energy vs. parameter)
+- Computes susceptibility χ = ∂E/∂μ
+- **Key findings**:
+  - Avoided crossings indicate parameter "sweet spots" for geometric manipulation
+  - Large susceptibility shows resonant amplification regimes
+  - Spectral structure reveals coupling between geometric modes
+
+**Generated Plots**:
+- `outputs/spaghetti_diagram.png` - Energy level structure
+- `outputs/susceptibility.png` - Geometric response analysis
+
+#### 4. Coupling Engineering (Research Direction #4) **[NEW ✅]**
+
+Analyzes matter-geometry coupling and impedance matching:
+
+```bash
+python examples/demo_coupling_engineering.py
+```
+
+**Output**:
+- Searches for optimal coupling constants λ for different matter fields
+- Analyzes impedance matching between geometry and matter
+- Computes transition rates via Fermi's golden rule
+- Identifies best candidates for experimental realization
+- **Key findings**:
+  - **Impedance mismatch major challenge**: R > 0.99 for most fields
+  - Phonon coupling best (R = 0.9934, T = 0.0066)
+  - Optimal λ values span 1e-10 to 1e-5 depending on field type
+  - Transition rates extremely small (~1e-186 Hz) with current parameters
+
+**Generated Plots**:
+- `outputs/coupling_comparison.png` - Optimal coupling constants
+- `outputs/impedance_matching.png` - Reflection/transmission analysis
+
+#### 5. Energy Scaling Tables (Original Analysis)
 
 Reproduce the fundamental energy-vs-curvature scaling for different reduction factors:
 
@@ -159,20 +230,55 @@ Radius r | No reduction | ×10⁻⁶       | ×10⁻¹²      | ×10⁻²⁴
 
 **Context**: Even with 10²⁴ reduction, 10m bubble requires ~2×10²⁰ J (≈ 50,000 megatons TNT)
 
-### Effective Coupling Derivation
+## Recent Updates (v0.3.0)
 
-First research direction - derive how polymer corrections modify the Einstein coupling:
+### ✅ Exact SU(2) Recoupling Symbols
 
-```bash
-python src/01_effective_coupling/derive_effective_coupling.py --mu 0.7 --j_max 10
-```
+**Implementation**: Integrated SymPy's exact Wigner 3j/6j symbol computation in `src/core/spin_network.py`
 
-### Coherence Mechanism Exploration
+**Before**: Placeholder approximations insufficient for spectral analysis
+**After**: Exact symbolic calculation → float conversion
 
-Second research direction - explore macroscopic coherence of spin network states:
+**Impact**: Enables credible resonance searches requiring precise recoupling coefficients
 
-```bash
-python src/02_coherence_mechanism/coherence_analysis.py --num_nodes 1000 --temperature 1e-6
+### ✅ Resonance Search Module (Direction #3)
+
+**File**: `src/03_critical_effects/resonance_search.py`
+
+**Components**:
+- `GeometricHamiltonian`: Builds H = H_volume + H_pentahedra + H_external
+- `ResonanceSearcher`: Parameter sweeps (μ, external field)
+- `detect_avoided_crossings()`: Identifies resonant parameter regimes
+- Visualization: Spaghetti diagrams, susceptibility plots
+
+**Key Result**: Framework for finding parameter "sweet spots" with geometric amplification
+
+### ✅ Coupling Engineering Module (Direction #4)
+
+**File**: `src/04_coupling_engineering/matter_coupling.py`
+
+**Components**:
+- Matter field types: EM (microwave, optical), scalar, fermionic, phonon, plasma
+- `MatterGeometryCoupling`: Interaction Hamiltonian H_int = λ O_geom ⊗ O_matter
+- `compute_transition_rates()`: Fermi's golden rule implementation
+- `search_optimal_coupling()`: Finds best λ for each matter field
+- `analyze_impedance_matching()`: Reflection/transmission analysis
+
+**Key Result**: Impedance mismatch identified as major experimental challenge (R > 0.99)
+
+### ✅ Bug Fixes (v0.2.0)
+
+**Critical Decoherence Bug** (identified by GPT-5):
+- **Issue**: Mixed states projected back to pure states during decoherence
+- **Fix**: Refactored to density matrix evolution (ρ → UρU†, no projection)
+- **Validation**: Purity now correctly decreases (1.0 → 0.99 for γ=0.001)
+
+**Thermal Distribution Normalization**:
+- **Issue**: Used norm=1.0 placeholder
+- **Fix**: Numerical integration for proper normalization
+- **Impact**: Physically realistic thermal state distributions
+
+**Documentation**: See `BUG_FIXES.md` for complete details
 
 ## Validation & Demos
 
@@ -191,22 +297,47 @@ Highlights:
 2) Effective coupling via coarse-graining (Direction #1)
 
 ```bash
-python examples/demo_coarse_graining.py
+python examples/demo_effective_coupling.py
 ```
 
 Highlights at L = 1 m:
 - No coherence: f_eff ≈ 6.5×10^-53 → reduction ≈ 1.5×10^52×
 - Full coherence: f_eff ≈ 1.0 → reduction ≈ 1× (classical)
 
-3) Spin-network coherence dynamics (Direction #2)
+3) Coherence dynamics with decoherence (Direction #2)
 
 ```bash
-python examples/demo_spin_network_evolution.py
+python examples/demo_coherence.py
 ```
 
 Highlights:
-- Demonstrates unitary evolution and a simplified decoherence model
-- Next step: upgrade to density-matrix (Lindblad) evolution to quantify purity loss
+- **Fixed bug**: Purity now decreases correctly (1.0 → 0.99, 0.91)
+- Density matrix evolution: ρ → UρU†
+- Decoherence rates set observable timescales
+
+4) Resonance search (Direction #3) **[NEW]**
+
+```bash
+python examples/demo_resonance_search.py
+```
+
+Highlights:
+- Parameter sweeps reveal energy level structure
+- Avoided crossing detection finds resonant regimes
+- Susceptibility analysis shows geometric amplification
+- Spaghetti diagrams visualize spectral evolution
+
+5) Coupling engineering (Direction #4) **[NEW]**
+
+```bash
+python examples/demo_coupling_engineering.py
+```
+
+Highlights:
+- Impedance mismatch major challenge (R > 0.99 most fields)
+- Optimal λ values: 1e-10 to 1e-5 depending on matter type
+- Best candidate: phonon coupling (T = 0.66%)
+- Transition rates very small (~1e-186 Hz) with current parameters
 
 ## Critical Open Questions
 
@@ -350,16 +481,25 @@ This framework provides theoretical foundation for:
 
 ## Current Status
 
-**Overall**: Early research phase - theoretical framework under development
+**Overall**: Advanced research phase - Directions #1-4 implemented
 
 **Key Results**:
 - ✅ Problem formulation complete
 - ✅ Energy scaling tables validated (see examples/)
-- 🚧 Effective coupling derivation in progress (src/01_effective_coupling/)
-- 🚧 Coherence mechanism theory initiated (src/02_coherence_mechanism/)
-- ⏳ Critical effects analysis not started
-- ⏳ Coupling engineering not started
-- ⏳ Parameter sweep not started
+- ✅ Effective coupling derivation complete (Direction #1)
+- ✅ Coherence mechanism with decoherence (Direction #2) - **Bug fixed!**
+- ✅ Resonance search module (Direction #3) - **NEW!**
+- ✅ Coupling engineering module (Direction #4) - **NEW!**
+- ✅ Exact SU(2) recoupling (SymPy Wigner symbols)
+- ⏳ Parameter sweep (Direction #5) - Planned
+- ⏳ Integration tests and unit tests
+
+**Version History**:
+- v0.1.0: Initial framework (Directions #1-2)
+- v0.2.0: Bug fixes (decoherence, thermal normalization)
+- **v0.3.0: Advanced modules (Directions #3-4, SymPy integration)** ← Current
+
+See `docs/IMPLEMENTATION_STATUS.md` for detailed technical summary.
 
 ## License
 

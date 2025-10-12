@@ -14,6 +14,14 @@ from dataclasses import dataclass
 from scipy.special import factorial
 import warnings
 
+try:
+    from sympy.physics.wigner import wigner_3j as sympy_wigner_3j
+    from sympy.physics.wigner import wigner_6j as sympy_wigner_6j
+    SYMPY_AVAILABLE = True
+except ImportError:
+    SYMPY_AVAILABLE = False
+    warnings.warn("SymPy not available; using placeholder Wigner symbols")
+
 from .constants import (
     L_PLANCK, HBAR, C, G, GAMMA_IMMIRZI,
     EPSILON_SMALL, J_MIN, J_MAX
@@ -27,15 +35,21 @@ from .constants import (
 def wigner_3j(j1: float, j2: float, j3: float, 
               m1: float, m2: float, m3: float) -> float:
     """
-    Compute Wigner 3j symbol using Racah formula.
+    Compute Wigner 3j symbol.
     
     Returns the value of:
         ⎛ j1  j2  j3 ⎞
         ⎝ m1  m2  m3 ⎠
     
-    This is a simplified implementation for small spins.
-    For production, use sympy.physics.wigner or specialized libraries.
+    Uses SymPy's exact implementation if available, otherwise falls back to
+    simplified version with limited accuracy.
     """
+    if SYMPY_AVAILABLE:
+        # Use SymPy's exact calculation
+        result = sympy_wigner_3j(j1, j2, j3, m1, m2, m3)
+        return float(result)
+    
+    # Fallback: basic selection rules and simple cases
     # Selection rules
     if abs(m1) > j1 or abs(m2) > j2 or abs(m3) > j3:
         return 0.0
@@ -48,16 +62,14 @@ def wigner_3j(j1: float, j2: float, j3: float,
     if not all((2*x) % 1 == 0 for x in [j1, j2, j3, m1, m2, m3]):
         return 0.0
     
-    # For small spins, use explicit formula
-    # This is a placeholder - for real calculations use a proper library
+    # Simple special cases
     if j1 == 0.5 and j2 == 0.5 and j3 == 0:
         if m1 + m2 == 0:
             return (-1)**(0.5 - m1) / np.sqrt(2)
         return 0.0
     
-    # For general case, return approximate value
-    # In production, replace with proper Racah formula or library call
-    warnings.warn("Using approximate 3j symbol - replace with proper implementation")
+    # Warn about limited accuracy
+    warnings.warn("Using fallback 3j symbol - install SymPy for exact results", stacklevel=2)
     return 0.0
 
 
@@ -71,9 +83,15 @@ def wigner_6j(j1: float, j2: float, j3: float,
         ⎩ j4  j5  j6 ⎭
     
     Critical for spin network calculations and recoupling theory.
-    For production use, integrate with su2-3nj libraries in workspace.
+    Uses SymPy's exact implementation if available.
     """
-    # Selection rules
+    if SYMPY_AVAILABLE:
+        # Use SymPy's exact calculation
+        result = sympy_wigner_6j(j1, j2, j3, j4, j5, j6)
+        return float(result)
+    
+    # Fallback: basic selection rules and simple cases
+    # Triangle inequalities (4 triangles must be satisfied)
     triangles = [
         (j1, j2, j3), (j1, j5, j6),
         (j4, j2, j6), (j4, j5, j3)
@@ -83,15 +101,14 @@ def wigner_6j(j1: float, j2: float, j3: float,
         if not (abs(a - b) <= c <= a + b):
             return 0.0
     
-    # Placeholder for small spins
-    # TODO: Integrate with su2-3nj-closedform workspace module
+    # Simple orthogonality case
     if all(j <= 2 for j in [j1, j2, j3, j4, j5, j6]):
-        # Use orthogonality for simple cases
         if j1 == j4 and j2 == j5 and j3 == j6:
             dim = (2*j1 + 1) * (2*j2 + 1) * (2*j3 + 1)
             return 1.0 / np.sqrt(dim) if dim > 0 else 0.0
     
-    warnings.warn("Using approximate 6j symbol - integrate su2-3nj modules")
+    # Warn about limited accuracy
+    warnings.warn("Using fallback 6j symbol - install SymPy for exact results", stacklevel=2)
     return 0.0
 
 
