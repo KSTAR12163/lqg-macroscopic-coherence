@@ -363,7 +363,7 @@ This framework provides theoretical foundation for:
 
 ## License
 
-This project is released under The Unlicense - free for any use, modification, distribution without restrictions.
+This project is released under the MIT License. See the `LICENSE` file in this repository for the full license text and details.
 
 ## Citations
 
