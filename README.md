@@ -148,12 +148,12 @@ python examples/energy_comparison_tables.py
 
 Expected output:
 ```
-Radius r | No reduction | ×10⁻⁶ | ×10⁻¹² | ×10⁻²⁴
----------|-------------|--------|---------|----------
-1 m      | 2.02×10⁴³ J | 2.02×10³⁷ J | 2.02×10³¹ J | 2.02×10¹⁹ J
-10 m     | 2.02×10⁴⁴ J | 2.02×10³⁸ J | 2.02×10³² J | 2.02×10²⁰ J
-100 m    | 2.02×10⁴⁵ J | 2.02×10³⁹ J | 2.02×10³³ J | 2.02×10²¹ J
-1 km     | 2.02×10⁴⁶ J | 2.02×10⁴⁰ J | 2.02×10³⁴ J | 2.02×10²² J
+Radius r | No reduction | ×10⁻⁶       | ×10⁻¹²      | ×10⁻²⁴
+---------|--------------|-------------|-------------|------------
+1 m      | 2.02×10⁴³ J  | 2.02×10³⁷ J | 2.02×10³¹ J | 2.02×10¹⁹ J
+10 m     | 2.02×10⁴⁴ J  | 2.02×10³⁸ J | 2.02×10³² J | 2.02×10²⁰ J
+100 m    | 2.02×10⁴⁵ J  | 2.02×10³⁹ J | 2.02×10³³ J | 2.02×10²¹ J
+1 km     | 2.02×10⁴⁶ J  | 2.02×10⁴⁰ J | 2.02×10³⁴ J | 2.02×10²² J
 ```
 
 **Context**: Even with 10²⁴ reduction, 10m bubble requires ~2×10²⁰ J (≈ 50,000 megatons TNT)
@@ -206,7 +206,6 @@ python examples/demo_spin_network_evolution.py
 Highlights:
 - Demonstrates unitary evolution and a simplified decoherence model
 - Next step: upgrade to density-matrix (Lindblad) evolution to quantify purity loss
-```
 
 ## Critical Open Questions
 
