@@ -12,6 +12,7 @@ import numpy as np
 from typing import List, Tuple, Optional
 from dataclasses import dataclass
 from scipy.special import factorial
+from functools import lru_cache
 import warnings
 
 try:
@@ -45,9 +46,8 @@ def wigner_3j(j1: float, j2: float, j3: float,
     simplified version with limited accuracy.
     """
     if SYMPY_AVAILABLE:
-        # Use SymPy's exact calculation
-        result = sympy_wigner_3j(j1, j2, j3, m1, m2, m3)
-        return float(result)
+        # Use cached exact calculation via SymPy
+        return float(_wigner_3j_cached(_hi(j1), _hi(j2), _hi(j3), _hi(m1), _hi(m2), _hi(m3)))
     
     # Fallback: basic selection rules and simple cases
     # Selection rules
@@ -86,9 +86,32 @@ def wigner_6j(j1: float, j2: float, j3: float,
     Uses SymPy's exact implementation if available.
     """
     if SYMPY_AVAILABLE:
-        # Use SymPy's exact calculation
-        result = sympy_wigner_6j(j1, j2, j3, j4, j5, j6)
-        return float(result)
+        # Use cached exact calculation via SymPy
+        return float(_wigner_6j_cached(_hi(j1), _hi(j2), _hi(j3), _hi(j4), _hi(j5), _hi(j6)))
+
+# =========================================================================
+# Cached helpers for Wigner symbols (half-integer quantization)
+# =========================================================================
+
+def _hi(x: float) -> int:
+    """Convert a (half-)integer float to an exact half-integer represented as int(2x)."""
+    return int(round(2 * x))
+
+def _fh(i: int) -> float:
+    """Convert back from half-integer int(2x) to float x."""
+    return i / 2.0
+
+@lru_cache(maxsize=4096)
+def _wigner_3j_cached(j1i: int, j2i: int, j3i: int, m1i: int, m2i: int, m3i: int):
+    j1, j2, j3 = _fh(j1i), _fh(j2i), _fh(j3i)
+    m1, m2, m3 = _fh(m1i), _fh(m2i), _fh(m3i)
+    return sympy_wigner_3j(j1, j2, j3, m1, m2, m3)
+
+@lru_cache(maxsize=4096)
+def _wigner_6j_cached(j1i: int, j2i: int, j3i: int, j4i: int, j5i: int, j6i: int):
+    j1, j2, j3 = _fh(j1i), _fh(j2i), _fh(j3i)
+    j4, j5, j6 = _fh(j4i), _fh(j5i), _fh(j6i)
+    return sympy_wigner_6j(j1, j2, j3, j4, j5, j6)
     
     # Fallback: basic selection rules and simple cases
     # Triangle inequalities (4 triangles must be satisfied)

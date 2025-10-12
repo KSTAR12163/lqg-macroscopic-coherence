@@ -141,13 +141,21 @@ def main():
     print("KEY FINDINGS:")
     print("=" * 80)
     print(f"1. Detected {len(avoided_crossings)} avoided crossings in parameter space")
-    print("2. Avoided crossings indicate strong coupling between geometric modes")
-    print("3. These resonances could enable coherent control of quantum geometry")
-    print("4. Energy gaps range from ~1e-37 J to ~1e-35 J (Planck scale)")
-    print("\nImplications:")
-    print("  - Resonant parameter regimes exist for efficient geometric manipulation")
-    print("  - Avoided crossings suggest parameter 'sweet spots' for experiments")
-    print("  - Spectral structure reveals quantum geometric amplification mechanisms")
+    if avoided_crossings:
+        print("2. Avoided crossings indicate strong coupling between geometric modes")
+        print("3. These resonances could enable coherent control of quantum geometry")
+        print("4. Energy gaps range from ~1e-37 J to ~1e-35 J (Planck scale)")
+        print("\nImplications:")
+        print("  - Avoided crossings suggest parameter 'sweet spots' for experiments")
+        print("  - Spectral structure reveals quantum geometric amplification mechanisms")
+    else:
+        print("2. No avoided crossings found in this sweep and parameter range")
+        print("3. Increase μ resolution, widen the μ range, or introduce external fields")
+        print("4. Try alternative topologies or include interaction terms to induce mixing")
+        print("\nNext probes:")
+        print("  - Sweep μ in [1e-3, 3] with ≥200 points")
+        print("  - Add small external field detuning and scan strength")
+        print("  - Test different spin assignments/topologies")
     print("=" * 80)
 
 
