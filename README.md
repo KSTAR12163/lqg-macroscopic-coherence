@@ -21,7 +21,8 @@ This repository tackles the **five critical research directions** needed to tran
 
 **Approach**: Systematic coarse-graining from Planck-scale spin networks to continuum effective field theory.
 
-**Target**: Derive explicit reduction factor $f_{\text{eff}}$ such that:
+**Target**: Derive explicit reduction factor $f_{\text{eff}}$ 
+such that:
 $$
 \rho_{\text{effective}} = f_{\text{eff}} \cdot \frac{c^4}{8\pi G} \cdot R
 $$

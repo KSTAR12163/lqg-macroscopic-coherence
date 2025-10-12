@@ -132,9 +132,14 @@ def spin_distribution_thermal(j: float, temperature: float) -> float:
     degeneracy = 2 * j + 1
     weight = degeneracy * np.exp(-beta * energy)
     
-    # Normalize approximately (should integrate to 1)
-    norm = 1.0  # Placeholder - proper normalization needs integration
-    return weight / norm
+    # Compute normalization by numerical integration
+    # Cache this if temperature is constant across calls
+    from scipy.integrate import quad
+    def integrand_norm(j_):
+        return (2*j_ + 1) * np.exp(-beta * L_PLANCK**2 * j_)
+    
+    norm, _ = quad(integrand_norm, J_MIN, J_MAX)
+    return weight / max(norm, EPSILON_SMALL)
 
 
 def spin_distribution_uniform(j: float) -> float:

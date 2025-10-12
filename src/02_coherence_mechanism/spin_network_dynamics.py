@@ -38,22 +38,40 @@ class SpinNetworkState:
     """
     Quantum state of a spin network.
     
-    In the full theory, this is a superposition of spin network basis states.
-    For simplicity, we represent a small network with explicit state vectors.
+    Can represent either a pure state (via amplitudes) or a mixed state (via density matrix).
+    When density_matrix is not None, it takes precedence over amplitudes.
     """
     network: SpinNetwork
-    amplitudes: np.ndarray  # Complex amplitudes for basis states
+    amplitudes: Optional[np.ndarray] = None  # Complex amplitudes for pure state
+    density_matrix: Optional[np.ndarray] = None  # Density matrix for mixed state
     time: float = 0.0
     
+    def __post_init__(self):
+        """Ensure we have either amplitudes or density matrix."""
+        if self.amplitudes is None and self.density_matrix is None:
+            raise ValueError("Must provide either amplitudes or density_matrix")
+        
+        # If only amplitudes given, compute density matrix
+        if self.density_matrix is None and self.amplitudes is not None:
+            self.density_matrix = np.outer(self.amplitudes, np.conj(self.amplitudes))
+    
     def norm(self) -> float:
-        """Norm of the state (should be 1 for normalized state)."""
+        """Trace of density matrix (should be 1 for normalized state)."""
+        if self.density_matrix is not None:
+            return np.real(np.trace(self.density_matrix))
         return np.linalg.norm(self.amplitudes)
     
     def normalize(self):
-        """Normalize the state."""
-        norm = self.norm()
-        if norm > EPSILON_SMALL:
-            self.amplitudes /= norm
+        """Normalize the density matrix."""
+        if self.density_matrix is not None:
+            trace = np.trace(self.density_matrix)
+            if abs(trace) > EPSILON_SMALL:
+                self.density_matrix /= trace
+        elif self.amplitudes is not None:
+            norm = np.linalg.norm(self.amplitudes)
+            if norm > EPSILON_SMALL:
+                self.amplitudes /= norm
+                self.density_matrix = np.outer(self.amplitudes, np.conj(self.amplitudes))
     
     def purity(self) -> float:
         """
@@ -62,10 +80,11 @@ class SpinNetworkState:
         For a pure state: purity = 1
         For maximally mixed: purity = 1/dim
         """
-        # Density matrix (for pure state, ρ = |ψ⟩⟨ψ|)
-        rho = np.outer(self.amplitudes, np.conj(self.amplitudes))
-        rho2 = rho @ rho
-        return np.real(np.trace(rho2))
+        if self.density_matrix is not None:
+            rho2 = self.density_matrix @ self.density_matrix
+            return np.real(np.trace(rho2))
+        # Fallback for pure state
+        return 1.0
     
     def von_neumann_entropy(self) -> float:
         """
@@ -75,9 +94,9 @@ class SpinNetworkState:
         For mixed state: S > 0
         """
         try:
-            rho = np.outer(self.amplitudes, np.conj(self.amplitudes))
+            rho = self.density_matrix if self.density_matrix is not None else np.outer(self.amplitudes, np.conj(self.amplitudes))
             # Add small regularization for numerical stability
-            rho += EPSILON_SMALL * np.eye(len(rho))
+            rho = rho + EPSILON_SMALL * np.eye(len(rho))
             eigenvalues = np.linalg.eigvalsh(rho)
             eigenvalues = eigenvalues[eigenvalues > EPSILON_SMALL]
             if len(eigenvalues) == 0:
@@ -145,17 +164,20 @@ class SpinNetworkHamiltonian:
         """
         Evolve state by time dt under Hamiltonian evolution.
         
-        |ψ(t+dt)⟩ = exp(-i H dt/ℏ) |ψ(t)⟩
+        For density matrix: ρ(t+dt) = U ρ(t) U† where U = exp(-i H dt/ℏ)
         """
         H = self.build_hamiltonian_matrix()
         
-        # Ensure state dimension matches
-        if len(state.amplitudes) != self.dim:
-            # Pad or truncate
-            new_amps = np.zeros(self.dim, dtype=complex)
-            min_dim = min(len(state.amplitudes), self.dim)
-            new_amps[:min_dim] = state.amplitudes[:min_dim]
-            state.amplitudes = new_amps
+        # Ensure density matrix dimension matches
+        if state.density_matrix is None:
+            state.density_matrix = np.outer(state.amplitudes, np.conj(state.amplitudes))
+        
+        if state.density_matrix.shape[0] != self.dim:
+            # Pad or truncate density matrix
+            new_rho = np.zeros((self.dim, self.dim), dtype=complex)
+            min_dim = min(state.density_matrix.shape[0], self.dim)
+            new_rho[:min_dim, :min_dim] = state.density_matrix[:min_dim, :min_dim]
+            state.density_matrix = new_rho
         
         # Time evolution operator - use smaller timesteps for stability
         # Scale dt to avoid numerical overflow in matrix exponential
@@ -167,17 +189,17 @@ class SpinNetworkHamiltonian:
             # On overflow, use identity (no evolution)
             U = np.eye(self.dim, dtype=complex)
         
-        # Evolve
-        new_amplitudes = U @ state.amplitudes
+        # Evolve density matrix: ρ -> U ρ U†
+        new_rho = U @ state.density_matrix @ np.conj(U.T)
         
         # Renormalize to avoid numerical drift
-        norm = np.linalg.norm(new_amplitudes)
-        if norm > EPSILON_SMALL:
-            new_amplitudes /= norm
+        trace = np.trace(new_rho)
+        if abs(trace) > EPSILON_SMALL:
+            new_rho /= trace
         
         return SpinNetworkState(
             network=state.network,
-            amplitudes=new_amplitudes,
+            density_matrix=new_rho,
             time=state.time + dt
         )
 
@@ -202,33 +224,35 @@ class DecoherenceModel:
     
     def apply_decoherence(self, state: SpinNetworkState, dt: float) -> SpinNetworkState:
         """
-        Apply decoherence for time dt.
+        Apply decoherence for time dt using simplified Lindblad-like evolution.
         
-        Simple model: exponential damping of off-diagonal density matrix elements.
+        Exponential damping of off-diagonal density matrix elements:
         ρ_ij(t) → ρ_ij(0) exp(-γ t) for i ≠ j
-        """
-        # Construct density matrix
-        rho = np.outer(state.amplitudes, np.conj(state.amplitudes))
         
-        # Apply decoherence
+        This preserves trace and positivity for small γ dt.
+        """
+        # Ensure we have density matrix
+        if state.density_matrix is None:
+            state.density_matrix = np.outer(state.amplitudes, np.conj(state.amplitudes))
+        
+        rho = state.density_matrix.copy()
+        
+        # Apply decoherence: damp off-diagonal elements
         decay = np.exp(-self.gamma * dt)
-        for i in range(len(rho)):
-            for j in range(len(rho)):
+        dim = len(rho)
+        for i in range(dim):
+            for j in range(dim):
                 if i != j:
                     rho[i, j] *= decay
         
-        # Extract new state (project back to pure state approximation)
-        # Find dominant eigenvector
-        eigenvalues, eigenvectors = np.linalg.eigh(rho)
-        idx = np.argmax(eigenvalues)
-        new_amplitudes = eigenvectors[:, idx]
-        
-        # Ensure normalization
-        new_amplitudes /= np.linalg.norm(new_amplitudes)
+        # Renormalize trace (should be close to 1 already)
+        trace = np.trace(rho)
+        if abs(trace) > EPSILON_SMALL:
+            rho /= trace
         
         return SpinNetworkState(
             network=state.network,
-            amplitudes=new_amplitudes,
+            density_matrix=rho,
             time=state.time + dt
         )
 
@@ -251,7 +275,7 @@ class SpinNetworkEvolutionSimulator:
     
     def create_initial_state(self, state_type: str = "coherent") -> SpinNetworkState:
         """
-        Create initial quantum state.
+        Create initial quantum state as density matrix.
         
         Args:
             state_type: "coherent" (all in phase), "random", "ground"
@@ -259,10 +283,10 @@ class SpinNetworkEvolutionSimulator:
         dim = self.hamiltonian.dim
         
         if state_type == "coherent":
-            # All amplitudes equal (maximally coherent)
+            # All amplitudes equal (maximally coherent pure state)
             amplitudes = np.ones(dim, dtype=complex) / np.sqrt(dim)
         elif state_type == "random":
-            # Random state
+            # Random pure state
             amplitudes = np.random.randn(dim) + 1j * np.random.randn(dim)
             amplitudes /= np.linalg.norm(amplitudes)
         elif state_type == "ground":
@@ -273,9 +297,12 @@ class SpinNetworkEvolutionSimulator:
         else:
             amplitudes = np.ones(dim, dtype=complex) / np.sqrt(dim)
         
+        # Create density matrix from pure state
+        density_matrix = np.outer(amplitudes, np.conj(amplitudes))
+        
         return SpinNetworkState(
             network=self.network,
-            amplitudes=amplitudes,
+            density_matrix=density_matrix,
             time=0.0
         )
     
@@ -462,8 +489,12 @@ def demonstrate_spin_network_evolution():
     print("KEY FINDINGS:")
     print("=" * 80)
     print("1. Without decoherence (γ=0): Coherence is preserved (unitary evolution)")
-    print("2. With decoherence: Purity decreases, entropy increases exponentially")
+    print("2. With decoherence: Purity decreases exponentially as Tr(ρ²) → 1/dim")
     print("3. Coherence time τ_coh ∝ 1/γ sets the timescale for maintaining quantum effects")
+    print("\nThe density matrix formulation properly captures decoherence:")
+    print("  - Off-diagonal elements decay: ρ_ij → ρ_ij exp(-γt)")
+    print("  - Purity Tr(ρ²) decreases from 1 (pure) toward 1/dim (maximally mixed)")
+    print("  - Entropy S = -Tr(ρ log ρ) increases from 0 to log(dim)")
     print("\nNext steps:")
     print("- Identify mechanisms to suppress γ (topological protection, symmetries)")
     print("- Search for parameter regimes where coherence is naturally sustained")
