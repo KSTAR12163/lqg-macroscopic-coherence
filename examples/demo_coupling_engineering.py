@@ -28,6 +28,12 @@ compute_transition_rates = coupling_module.compute_transition_rates
 plot_coupling_comparison = coupling_module.plot_coupling_comparison
 plot_impedance_analysis = coupling_module.plot_impedance_analysis
 
+# Import driven Lindblad evolution (GPT-5 suggestion)
+lindblad_module = importlib.import_module('src.04_coupling_engineering.driven_lindblad')
+lindblad_evolution = lindblad_module.lindblad_evolution
+plot_driven_evolution = lindblad_module.plot_driven_evolution
+estimate_observable_rate = lindblad_module.estimate_observable_rate
+
 
 def main():
     print("=" * 80)
@@ -168,6 +174,47 @@ def main():
     print(f"3. Optimal coupling constants span {comparison_data[-1]['lambda']:.1e} to {comparison_data[0]['lambda']:.1e}")
     print(f"4. Reflection coefficients range from {comparison_data[0]['reflection']:.3f} to {comparison_data[-1]['reflection']:.3f}")
     
+    # ========================================================================
+    # 8. Driven evolution with decoherence (GPT-5 addition)
+    # ========================================================================
+    print(f"\n{'=' * 80}")
+    print("DRIVEN EVOLUTION WITH DECOHERENCE (GPT-5 enhancement)")
+    print("=" * 80)
+    print("\nSimulating realistic driven transitions including decoherence...\n")
+    
+    # Use best candidate from impedance matching
+    best_coupling = MatterGeometryCoupling(
+        network=network,
+        matter_field=MATTER_FIELDS[best_field],
+        coupling_constant=optimal_couplings[best_field][0]
+    )
+    
+    # Build Hamiltonians
+    H_system = best_coupling.build_geometry_operator(16) + best_coupling.build_matter_operator(16)
+    H_drive = best_coupling.build_interaction_hamiltonian(16)
+    
+    # Evolution parameters
+    drive_amplitude = 1e-30  # Weak driving
+    gamma = 0.01  # Decoherence rate (from Direction #2)
+    simulation_time = 1e-10  # 0.1 ns
+    
+    # Run driven evolution
+    initial_state = np.zeros(16)
+    initial_state[0] = 1.0  # Ground state
+    times = np.linspace(0, simulation_time, 200)
+    
+    result = lindblad_evolution(
+        H_system, H_drive, initial_state,
+        gamma, drive_amplitude, times
+    )
+    
+    print(f"Driven transition rate: {result.driven_rate:.2e} Hz")
+    print(f"Coherence-limited rate: {result.coherence_limited_rate:.2e} Hz")
+    print(f"SNR (driven/decoherence): {result.driven_rate/gamma if gamma > 0 else 0:.2e}")
+    
+    # Plot driven evolution
+    plot_driven_evolution(result, str(output_dir / "driven_evolution.png"))
+    
     print("\nImplications for Experimental Realization:")
     print("-" * 80)
     print("• EM fields (microwave/optical) show best impedance matching to quantum geometry")
@@ -175,6 +222,7 @@ def main():
     print("• Optimal λ values guide experimental parameter selection")
     print("• Transition rates indicate observable timescales (if coherence maintained)")
     print(f"• Best candidate ({comparison_data[0]['field']}) has {comparison_data[0]['transmission']*100:.1f}% transmission efficiency")
+    print(f"• Decoherence limits observable rates to ~{result.coherence_limited_rate:.2e} Hz")
     
     print("\nNext Steps:")
     print("-" * 80)

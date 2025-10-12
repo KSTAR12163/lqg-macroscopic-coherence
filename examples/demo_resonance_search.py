@@ -52,12 +52,13 @@ def main():
     print(f"Hamiltonian dimension: {H.shape[0]} × {H.shape[1]}\n")
     
     # ========================================================================
-    # 3. Perform parameter sweep
+    # 3. Perform parameter sweep (higher resolution per GPT-5)
     # ========================================================================
-    print("Performing parameter sweep over μ...")
+    print("Performing parameter sweep over μ (high resolution)...")
     searcher = ResonanceSearcher(network)
     
-    mu_values = np.linspace(0.01, 0.5, 30)
+    # GPT-5: Increase resolution to 100+ points for better detection
+    mu_values = np.linspace(0.01, 1.0, 100)
     
     mu_vals, energy_spectra = searcher.sweep_polymer_parameter(mu_values, external_field=0.0)
     
@@ -73,11 +74,23 @@ def main():
     
     print(f"\nFound {len(avoided_crossings)} avoided crossings:")
     print("-" * 60)
-    for idx, crossing in enumerate(avoided_crossings[:10], 1):
-        print(f"  {idx}. μ = {crossing.parameter_value:.3f}, levels {crossing.level1_idx} ↔ {crossing.level2_idx}, gap = {crossing.min_gap:.2e} J")
     
-    if len(avoided_crossings) > 10:
-        print(f"  ... and {len(avoided_crossings) - 10} more")
+    if len(avoided_crossings) == 0:
+        # GPT-5: Provide actionable next steps when none found
+        print("  (None detected with current threshold and resolution)")
+        print("\n  Next probes to try:")
+        print("  • Increase μ resolution (current: 100 points)")
+        print("  • Widen μ range beyond [0.01, 1.0]")
+        print("  • Add weak external field to induce level mixing")
+        print("  • Try different network topologies (non-tetrahedral)")
+        print("  • Vary spin labels to explore richer spectra")
+        print("  • Check susceptibility peaks (may be more robust)")
+    else:
+        for idx, crossing in enumerate(avoided_crossings[:10], 1):
+            print(f"  {idx}. μ = {crossing.parameter_value:.3f}, levels {crossing.level1_idx} ↔ {crossing.level2_idx}, gap = {crossing.min_gap:.2e} J")
+        
+        if len(avoided_crossings) > 10:
+            print(f"  ... and {len(avoided_crossings) - 10} more")
     
     # ========================================================================
     # 5. Generate spaghetti diagram
@@ -101,6 +114,19 @@ def main():
     
     # Compute and plot susceptibility
     susceptibility = searcher.compute_susceptibility(mu_vals, energy_spectra)
+    
+    # GPT-5: Identify susceptibility peaks (more robust than gap detection)
+    print("\nSusceptibility Analysis:")
+    print("-" * 60)
+    max_susceptibilities = np.max(np.abs(susceptibility), axis=0)
+    top_levels = np.argsort(max_susceptibilities)[-5:][::-1]
+    
+    print("Top 5 levels by maximum |∂E/∂μ|:")
+    for level in top_levels:
+        max_chi = max_susceptibilities[level]
+        max_idx = np.argmax(np.abs(susceptibility[:, level]))
+        max_mu = mu_vals[max_idx]
+        print(f"  Level {level}: max |χ| = {max_chi:.2e} J at μ = {max_mu:.3f}")
     
     plot_susceptibility(
         mu_vals,
