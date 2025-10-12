@@ -98,9 +98,10 @@ def print_energy_table():
     # Context examples
     print("CONTEXT:")
     print("-" * 100)
-    print(f"1 megaton TNT                = {MEGATON_TNT*1e6:.2e} J")
-    print(f"10m bubble, 10²⁴ reduction   = {energy_for_bubble(10, 1e24):.2e} J")
-    megatons = energy_for_bubble(10, 1e24) / (MEGATON_TNT * 1e6)
+    print(f"1 megaton TNT                = {MEGATON_TNT:.2e} J")
+    E10 = energy_for_bubble(10, 1e24)
+    print(f"10m bubble, 10²⁴ reduction   = {E10:.2e} J")
+    megatons = E10 / MEGATON_TNT
     print(f"                              ≈ {megatons:.0f} megatons TNT")
     print("-" * 100)
     print()

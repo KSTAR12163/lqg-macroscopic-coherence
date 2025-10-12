@@ -52,7 +52,9 @@ EINSTEIN_COUPLING = 8 * np.pi * G / C**4  # s²/kg·m ≈ 2.075 × 10^-43
 # Energy density per unit curvature (inverse of Einstein coupling)
 RHO_PER_CURVATURE = C**4 / (8 * np.pi * G)  # J/m³ per (1/m²) ≈ 4.82 × 10^42
 
-# For reference: 1 megaton TNT
+# For reference: TNT energy equivalents
+TON_TNT = 4.184e9       # J
+KILOTON_TNT = 4.184e12  # J
 MEGATON_TNT = 4.184e15  # J
 
 # ============================================================================
@@ -188,11 +190,10 @@ def energy_in_context(energy_joules: float) -> str:
         car_tanks = energy_joules / ENERGY_SCALES['car_fuel_tank']
         return f"{car_tanks:.2f} car fuel tanks"
     elif energy_joules < ENERGY_SCALES['tsar_bomba']:
-        megatons = energy_joules / MEGATON_TNT / 1e6
-        kilotons = megatons * 1000
+        kilotons = energy_joules / KILOTON_TNT
         return f"{kilotons:.2f} kilotons TNT"
     elif energy_joules < ENERGY_SCALES['global_annual_energy']:
-        megatons = energy_joules / MEGATON_TNT / 1e6
+        megatons = energy_joules / MEGATON_TNT
         return f"{megatons:.2f} megatons TNT"
     else:
         years_global = energy_joules / ENERGY_SCALES['global_annual_energy']

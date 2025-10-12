@@ -156,7 +156,7 @@ Radius r | No reduction | ×10⁻⁶ | ×10⁻¹² | ×10⁻²⁴
 1 km     | 2.02×10⁴⁶ J | 2.02×10⁴⁰ J | 2.02×10³⁴ J | 2.02×10²² J
 ```
 
-**Context**: Even with 10²⁴ reduction, 10m bubble requires ~2×10²⁰ J (≈ 48 megatons TNT)
+**Context**: Even with 10²⁴ reduction, 10m bubble requires ~2×10²⁰ J (≈ 50,000 megatons TNT)
 
 ### Effective Coupling Derivation
 
