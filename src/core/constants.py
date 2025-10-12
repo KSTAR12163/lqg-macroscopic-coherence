@@ -26,6 +26,9 @@ G = const.G  # m^3 kg^-1 s^-2
 # Reduced Planck constant
 HBAR = const.hbar  # J·s
 
+# Boltzmann constant
+K_B = const.k  # J/K
+
 # Planck length
 L_PLANCK = np.sqrt(HBAR * G / C**3)  # m ≈ 1.616 × 10^-35 m
 
@@ -104,6 +107,10 @@ ENERGY_SCALES = {
 # Machine epsilon safety margin
 EPSILON = np.finfo(float).eps
 
+# Small and large epsilon for numerical stability
+EPSILON_SMALL = 1e-100  # Small value to avoid division by zero
+EPSILON_LARGE = 1e100  # Large value for capping
+
 # Numerical tolerance for comparisons
 TOL_ABSOLUTE = 1e-15
 TOL_RELATIVE = 1e-12
@@ -125,6 +132,7 @@ MU_MAX = 10.0  # Above this: strong quantum regime, may be unphysical
 # SU(2) quantum number bounds
 J_MIN = 0.5  # Minimum spin (fundamental representation)
 J_MAX = 1000  # Practical upper bound for numerics
+J_TYPICAL = 1.0  # Typical spin for phenomenological estimates
 
 # Curvature scale bounds (1/m²)
 R_MIN = 1 / (1e6)**2  # Very gentle curvature (1 km scale)

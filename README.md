@@ -95,7 +95,50 @@ lqg-macroscopic-coherence/
 
 ## Quick Start
 
-### Energy Scaling Tables
+### Installation
+
+```bash
+# Clone the repository
+cd /path/to/lqg-macroscopic-coherence
+
+# Install dependencies
+pip install numpy scipy matplotlib
+
+# Create output directory
+mkdir -p outputs
+```
+
+### Running Demonstrations
+
+#### 1. Coarse-Graining and f_eff Derivation (Research Direction #1)
+
+Demonstrates how polymer corrections renormalize from Planck to macroscopic scale:
+
+```bash
+python examples/demo_coarse_graining.py
+```
+
+**Output**: 
+- Computes f_eff at multiple length scales
+- Shows renormalization group flow across scales
+- Generates plots showing how coherence affects energy reduction
+- **Key finding**: Without macroscopic coherence, f_eff ~ 10^-53 at 1m scale (enormous reduction but insufficient). With full coherence, f_eff ~ 1 (no reduction). Need additional mechanisms.
+
+#### 2. Spin Network Evolution and Coherence (Research Direction #2)
+
+Simulates quantum evolution of spin network states to understand decoherence:
+
+```bash
+python examples/demo_spin_network_evolution.py
+```
+
+**Output**:
+- Simulates 4-node spin network evolution
+- Compares evolution with different decoherence rates
+- Generates plots of purity, entropy, and coherence time
+- **Key finding**: Coherence time τ_coh ∝ 1/γ sets the timescale for quantum geometric effects. Need mechanisms to suppress γ (topological protection, symmetries).
+
+#### 3. Energy Scaling Tables (Original Analysis)
 
 Reproduce the fundamental energy-vs-curvature scaling for different reduction factors:
 
