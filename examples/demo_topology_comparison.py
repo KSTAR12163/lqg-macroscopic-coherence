@@ -30,10 +30,12 @@ print("=" * 80)
 # Generate both
 print("\nGenerating topologies...")
 network_oct, info_oct = generate_topology(topology_type='octahedral')
-print(f"Octahedral: {info_oct.num_nodes} nodes, {info_oct.num_edges} edges, coord={info_oct.avg_coordination:.1f}")
+coord_oct = 2 * info_oct.num_edges / info_oct.num_nodes
+print(f"Octahedral: {info_oct.num_nodes} nodes, {info_oct.num_edges} edges, coord={coord_oct:.1f}")
 
 network_ico, info_ico = generate_topology(topology_type='icosahedral')
-print(f"Icosahedral: {info_ico.num_nodes} nodes, {info_ico.num_edges} edges, coord={info_ico.avg_coordination:.1f}")
+coord_ico = 2 * info_ico.num_edges / info_ico.num_nodes
+print(f"Icosahedral: {info_ico.num_nodes} nodes, {info_ico.num_edges} edges, coord={coord_ico:.1f}")
 
 # Test coupling
 matter_field = MatterFieldProperties(
@@ -52,7 +54,7 @@ M_oct = abs(eigvec_oct[:, 1].conj() @ H_int_oct @ eigvec_oct[:, 0])
 
 coupling_ico = MatterGeometryCoupling(network_ico, matter_field, 1e-4, mu=0.5)
 _, eigvec_ico = coupling_ico.compute_energy_spectrum(32)
-H_int_ico = coupling_oct.build_interaction_hamiltonian(32)
+H_int_ico = coupling_ico.build_interaction_hamiltonian(32)
 M_ico = abs(eigvec_ico[:, 1].conj() @ H_int_ico @ eigvec_ico[:, 0])
 
 print(f"\nOctahedral coupling: {M_oct:.3e} J")
