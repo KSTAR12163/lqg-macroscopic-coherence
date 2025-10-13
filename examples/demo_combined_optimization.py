@@ -1,5 +1,5 @@
 """
-Demonstration of combined resonance + coupling optimization (Gemini 2.5 Pro).
+Demonstration of combined resonance + coupling optimization (researcher).
 
 This is the highest priority next step: finding parameter "sweet spots" (μ*, λ*)
 where geometric resonances dramatically enhance matter-geometry coupling strength,
@@ -49,7 +49,7 @@ def main():
 
     print(f"Test network: {len(network.nodes)} nodes, {len(network.edges)} edges\n")
     # ========================================================================
-    # 2. Parameter sweep (wider range per Gemini recommendation)
+    # 2. Parameter sweep (wider range per researcher recommendation)
     # ========================================================================
     print("Parameter sweep configuration:")
     print("  μ range: [0.001, 3.0] (extended from [0.01, 1.0])")
@@ -146,7 +146,7 @@ def main():
         print("  4. Try logarithmic μ grid near suspected transitions")
     
     print(f"\n{'=' * 80}")
-    print("NEXT STEPS (Gemini 2.5 Pro recommendations)")
+    print("NEXT STEPS (researcher recommendations)")
     print("=" * 80)
     print("\n1. ⏳ Driven response curves (Rabi-like lineshapes)")
     print("2. ⏳ Systematic topology study (cubic, octahedral, complex)")

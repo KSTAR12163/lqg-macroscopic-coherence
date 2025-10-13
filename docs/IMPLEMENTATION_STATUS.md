@@ -375,9 +375,10 @@ SNR = signal / noise
 5. Fermi's golden rule
 
 ### Implementation Guidance
-- **GPT-5 Assessment:** Identified critical decoherence bug
-- **Gemini 2.5 Pro Roadmap:** Guided Directions #3-5
-- **User Research Vision:** "Move the needle" on polymer LQG engineering
+
+ - **researcher Assessment:** Identified critical decoherence bug
+ - **researcher Roadmap:** Guided Directions #3-5
+ - **User Research Vision:** "Move the needle" on polymer LQG engineering
 
 ---
 
@@ -385,7 +386,7 @@ SNR = signal / noise
 
 **Framework Status:** Advanced modules operational
 
-**Key Achievement:** Implemented Directions #3-4 per Gemini 2.5 Pro recommendations:
+**Key Achievement:** Implemented Directions #3-4 per researcher recommendations:
 1. ✅ Exact SU(2) recoupling (SymPy)
 2. ✅ Resonance search with avoided crossing detection
 3. ✅ Matter-geometry coupling with impedance matching

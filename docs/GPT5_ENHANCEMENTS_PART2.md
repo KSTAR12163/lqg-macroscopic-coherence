@@ -2,7 +2,7 @@
 
 **Date**: October 12, 2025  
 **Framework Version**: 0.4.1  
-**Implementation**: researcher High-Priority Recommendations
+**Implementation**: GPT-5 High-Priority Recommendations
 
 ---
 
@@ -41,7 +41,7 @@ Following researcher code review and verification, I've implemented the highest-
 
 **Problem**: Previous implementation used ρ ~ 1/gap² (α=2) without justification.
 
-**researcher Recommendation**: Make α configurable, default α=1 for physical consistency.
+**GPT-5 Recommendation**: Make α configurable, default α=1 for physical consistency.
 
 **Implementation**:
 
@@ -90,7 +90,7 @@ Both are dimensionally consistent:
 
 **Problem**: Tetrahedral topology alone yields Γ_driven ~ 10^-189 Hz << γ.
 
-**researcher Recommendation (Priority #1)**: 2D (μ, external field) sweep to break degeneracies and induce mixing.
+**GPT-5 Recommendation (Priority #1)**: 2D (μ, external field) sweep to break degeneracies and induce mixing.
 
 **Implementation**:
 
@@ -207,7 +207,7 @@ Best candidate:
 
 ### 3. Acceptance Criteria and Milestone Tracking ✅
 
-**researcher Recommendation**: Standardized feasibility gates with progress toward Γ_driven/γ ≥ 10.
+**GPT-5 Recommendation**: Standardized feasibility gates with progress toward Γ_driven/γ ≥ 10.
 
 **Implementation**:
 
@@ -232,7 +232,7 @@ def analyze_field_enhancement(results, decoherence_rate=0.01, top_n=10):
 **Example Output**:
 
 ```
-ACCEPTANCE CRITERION (researcher)
+ACCEPTANCE CRITERION (GPT-5)
 ════════════════════════════
 
 Milestone: Approach Γ_driven/γ ~ 10⁻³ to 10⁻⁶
@@ -243,7 +243,7 @@ Improvement: 3.52e-18×
 SNR (Γ/γ): 3.52e-205
 
 ✗ INSUFFICIENT: SNR = 3.52e-205 << 10⁻⁶
-    Recommend: Topology study (researcher Priority #2)
+   Recommend: Topology study (GPT-5 Priority #2)
 ```
 
 ---
@@ -267,7 +267,7 @@ SNR (Γ/γ): 3.52e-205
 
 ### Not Started ❌
 
-1. **Topology generator** (researcher Priority #2)
+1. **Topology generator** (GPT-5 Priority #2)
 2. **Driven response curves** (Rabi lineshapes)
 3. **Crossing detection robustness** (eigenvector tracking)
 4. **HPC infrastructure** (Direction #5)
@@ -331,7 +331,7 @@ h_max = 1e-30, ⟨O_ext⟩ ~ L_Planck³ ~ 1e-105
 
 ---
 
-## researcher Recommended Next Steps (Prioritized)
+## GPT-5 Recommended Next Steps (Prioritized)
 
 ### Priority #1: Topology Study (HIGHEST IMPACT)
 
@@ -584,7 +584,7 @@ Best SNR: 3.52e-205 << 10⁻⁶
 2. **Extensibility**: External field infrastructure ready for different O_ext operators
 3. **Systematic**: 2D sweep explores (μ, h) space comprehensively
 4. **Transparent**: Acceptance criteria clearly report progress toward milestones
-5. **Validated**: researcher verified math and code correctness
+5. **Validated**: GPT-5 verified math and code correctness
 
 ### Current Limitations
 
@@ -595,7 +595,7 @@ Best SNR: 3.52e-205 << 10⁻⁶
 
 ### Physical Interpretation
 
-**researcher's Assessment**:
+**GPT-5's Assessment**:
 
 Even with:
 - Physical DOS (α=1)
@@ -608,7 +608,7 @@ Still get: **Γ_driven ~ 10^-207 Hz << γ ~ 0.01 Hz**
 
 **Required Enhancement**: ~10^205× (!!!)
 
-**Most Promising Path**: Topology study (researcher Priority #1)  
+**Most Promising Path**: Topology study (GPT-5 Priority #1)  
 → Different network structures may support orders-of-magnitude stronger resonances
 
 ---
@@ -659,7 +659,7 @@ None used (deterministic computation).
 
 ### New Files
 
-1. **researcher_ENHANCEMENTS_PART2.md** (this document)
+1. **GPT5_ENHANCEMENTS_PART2.md** (this document)
 2. **src/05_combined_optimization/field_sweep.py** (~350 lines)
 3. **examples/demo_field_sweep.py** (~140 lines)
 
@@ -690,7 +690,7 @@ Direction #4 (Coupling Eng.)      ──┘    ├─ field_sweep.py (NEW)
 
 ## Conclusion
 
-### researcher Implementation Summary
+### GPT-5 Implementation Summary
 
 ✅ **Completed**:
 1. Density of states parameterization (α=1 physical default)
@@ -717,7 +717,7 @@ External field infrastructure is operational but current parameter choices (h_ma
 
 ### Highest Impact Next Step
 
-**Topology Study (researcher Priority #1)**:
+**Topology Study (GPT-5 Priority #1)**:
 
 Test whether network structure (cubic, octahedral, icosahedral) supports:
 - Stronger resonances (smaller gaps)
@@ -734,7 +734,7 @@ If topology is the key missing ingredient, could gain 20-100 orders of magnitude
 
 **Problem**: Previous metrics (Γ_driven from Fermi's golden rule) are indirect. Need direct experimental observable.
 
-**researcher Recommendation**: Implement driven response curves that directly visualize Γ_driven/γ ratio.
+**GPT-5 Recommendation**: Implement driven response curves that directly visualize Γ_driven/γ ratio.
 
 **Physical Motivation**:
 
@@ -882,7 +882,7 @@ Even the **400× octahedral boost** is insufficient. Would need:
 
 ---
 
-## Summary of All researcher Implementations
+## Summary of All GPT-5 Implementations
 
 ### Status Overview
 
@@ -912,7 +912,7 @@ Even the **400× octahedral boost** is insufficient. Would need:
 3. **Multiple strategies needed**: No single parameter provides enough gain
 4. **Direct visualization valuable**: Rabi curves make observability criterion transparent
 
-### Completed Work (All 6 researcher Priorities) ✅
+### Completed Work (All 6 GPT-5 Priorities) ✅
 
 1. ✅ **Density of states parameterization** (α parameter)
 2. ✅ **External field infrastructure** (H_ext support)

@@ -91,7 +91,7 @@ def main():
     
     # Acceptance criterion (researcher recommendation)
     print("\n" + "=" * 80)
-    print("ACCEPTANCE CRITERION (GPT-5)")
+    print("ACCEPTANCE CRITERION (researcher)")
     print("=" * 80)
     print("\nMilestone: Increase |⟨f|H_int|i⟩| and approach Γ_driven/γ ~ 10⁻³ to 10⁻⁶")
     
