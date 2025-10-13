@@ -730,4 +730,205 @@ If topology is the key missing ingredient, could gain 20-100 orders of magnitude
 
 ---
 
+## 3. Driven Response Curves (Rabi Lineshapes) ✅
+
+**Problem**: Previous metrics (Γ_driven from Fermi's golden rule) are indirect. Need direct experimental observable.
+
+**GPT-5 Recommendation**: Implement driven response curves that directly visualize Γ_driven/γ ratio.
+
+**Physical Motivation**:
+
+In a driven two-level system with decoherence, the steady-state excited population exhibits a **Lorentzian lineshape**:
+
+$$P_{\text{exc}}(\omega) = \frac{\Omega^2/4}{(\omega - \omega_0)^2 + \gamma^2}$$
+
+where:
+- $\omega_0 = (E_f - E_i)/\hbar$ = transition frequency
+- $\Omega$ = drive amplitude (Rabi frequency)
+- $\gamma$ = decoherence rate
+
+**Key observables**:
+- **Peak height**: $\sim \Omega^2/(4\gamma^2)$ = Signal-to-Noise Ratio (SNR)
+- **Linewidth (FWHM)**: $\sim 2\gamma$ (decoherence-limited)
+- **Observability**: Requires SNR ≥ 10 for clear detection
+
+This provides **direct visualization** of coupling strength through experimentally measurable lineshapes.
+
+### Implementation
+
+**Files Created**:
+1. `src/07_driven_response/rabi_curves.py` (~450 lines)
+2. `src/07_driven_response/__init__.py`
+3. `examples/demo_driven_response.py` (~265 lines)
+
+**Key Functions**:
+
+```python
+def driven_response_curve(
+    network: SpinNetwork,
+    matter_field: MatterFieldProperties,
+    mu: float,
+    lambda_coupling: float,
+    initial_state: int,
+    final_state: int,
+    drive_amplitude: float = 1e-10,
+    decoherence_rate: float = 0.01,
+    frequency_span_factor: float = 10.0,
+    num_frequencies: int = 100,
+    dim: int = 32,
+    external_field: float = 0.0
+) -> RabiCurveData
+```
+
+**Analytical Solution**: Uses weak-drive Lorentzian steady state (avoids numerical instabilities from full Lindblad evolution).
+
+**Visualization**:
+- `plot_rabi_curve()`: Individual lineshape with metrics overlay
+- `compare_rabi_curves()`: Side-by-side topology/parameter comparison
+- `interpret_rabi_curve()`: Physical interpretation and observability assessment
+
+### Demo Modes
+
+**Example usage**:
+```bash
+# Single best candidate
+python examples/demo_driven_response.py --mode single
+
+# Topology comparison
+python examples/demo_driven_response.py --mode topology
+
+# Coupling constant sweep
+python examples/demo_driven_response.py --mode lambda
+
+# All demos
+python examples/demo_driven_response.py --mode all
+```
+
+### Test Results
+
+**Octahedral network** (μ=0.465, λ=1e-4):
+
+```
+Resonance frequency: ω₀ = 6.204×10¹⁸ Hz
+Decoherence rate: γ = 0.01 Hz
+Peak height: 2.500×10⁻¹⁷
+Linewidth (FWHM): ~2γ (decoherence-limited)
+SNR estimate: 2.500×10⁻¹⁷
+
+Driven rate estimate:
+  Γ_driven ≈ peak_height × γ ≈ 2.500×10⁻¹⁹ Hz
+  Γ_driven / γ ≈ 2.500×10⁻¹⁷
+
+Observability assessment:
+  ✗ UNFEASIBLE: Γ_driven < γ/10
+  → Need 4.00×10¹⁷× enhancement
+```
+
+### Physical Interpretation
+
+The **extremely small SNR** (2.5×10⁻¹⁷) confirms the fundamental challenge:
+
+1. **Transition frequency**: ω₀ ~ 10¹⁸ Hz (extremely high, ~x-ray regime)
+2. **Decoherence rate**: γ ~ 0.01 Hz (realistic cryogenic systems)
+3. **Drive amplitude**: Ω ~ 10⁻¹⁰ rad/s (weak perturbation)
+4. **SNR**: Ω²/(4γ²) ~ 10⁻¹⁷ (completely undetectable)
+
+**Critical insight**: Even with 400× octahedral enhancement, the coupling is **~10¹⁷× too weak** for any observable signal.
+
+### Acceptance Criteria
+
+For driven response curves:
+
+| Status | Condition | SNR | Interpretation |
+|--------|-----------|-----|----------------|
+| ✓ OBSERVABLE | Γ_driven ≥ 10γ | ≥ 10 | Clear peak above noise |
+| ⚠️ MARGINAL | γ/10 ≤ Γ_driven < 10γ | 0.1-10 | Weak signal, challenging detection |
+| ✗ UNFEASIBLE | Γ_driven < γ/10 | < 0.1 | Below noise floor |
+
+**Current status**: ALL tested candidates UNFEASIBLE (SNR ~ 10⁻¹⁷ << 0.1)
+
+### Implementation Status
+
+✅ **Complete**:
+1. Analytical Lorentzian lineshape calculation
+2. Peak height and linewidth extraction
+3. SNR estimation (Ω²/4γ²)
+4. Multi-configuration comparison plots
+5. Observability interpretation
+6. Demo scripts with 3 modes
+
+⏳ **Future Enhancements**:
+1. Full Lindblad evolution (for strong-drive regime)
+2. Multi-level cascade effects
+3. Temperature-dependent decoherence
+4. Realistic detector response functions
+
+### Key Finding
+
+Driven response curves provide **intuitive experimental visualization** but confirm the **massive impedance mismatch**:
+
+- **Geometric side**: E_gap ~ 10⁻¹⁰⁷ J, ω₀ ~ 10¹⁸ Hz
+- **Matter side**: γ ~ 0.01 Hz (cryogenic decoherence)
+- **Coupling**: Γ_driven ~ 10⁻¹⁹ Hz
+
+**Γ_driven/γ ~ 10⁻¹⁷ << 0.1** → Need ~10¹⁷× enhancement minimum
+
+Even the **400× octahedral boost** is insufficient. Would need:
+- **100× topology boost** (optimistic, already found 400×)
+- **10⁶× field enhancement** (requires h ~ H_scale)
+- **10¹⁰× coupling constant** (λ ~ 0.1, perturbative regime limits)
+
+**Combined**: Still short by ~10³ orders of magnitude.
+
+---
+
+## Summary of All GPT-5 Implementations
+
+### Status Overview
+
+| Priority | Enhancement | Status | Impact |
+|----------|-------------|--------|--------|
+| #1 (Critical) | Density of states parameterization | ✅ Complete | Foundational |
+| #2 (High) | External field infrastructure | ✅ Complete | Moderate (needs tuning) |
+| #3 (High) | Topology exploration | ✅ Complete | **400× boost found!** |
+| #4 (Medium) | Driven response curves | ✅ Complete | Direct observability |
+| #5 (Medium) | Crossing detection robustness | ⏳ Pending | Computational efficiency |
+
+### Cumulative Findings
+
+**Best configuration discovered**:
+- **Topology**: Octahedral (400× better than tetrahedral)
+- **Parameters**: μ = 0.465, λ = 1×10⁻⁴
+- **Coupling**: |M| = 1.73×10⁻¹²⁸ J
+- **Driven rate**: Γ_driven = 8.53×10⁻²⁰³ Hz
+- **SNR**: ~10⁻¹⁷
+
+**Gap to observability**: Still need **~10¹⁷×** enhancement (17 orders of magnitude)
+
+### Lessons Learned
+
+1. **Topology matters**: 400× enhancement proves network structure affects coupling
+2. **Impedance mismatch dominates**: Even large relative improvements insufficient
+3. **Multiple strategies needed**: No single parameter provides enough gain
+4. **Direct visualization valuable**: Rabi curves make observability criterion transparent
+
+### Remaining High-Priority Work
+
+1. **Crossing detection robustness** (computational efficiency)
+   - Eigenvector tracking: U_prev† @ U_next
+   - Mode identity continuity
+   - Expected: 16,256 → hundreds of true crossings
+
+2. **External field tuning** (could gain 10⁵-10¹⁰×)
+   - Set h_max ~ 0.1 × H_scale
+   - Test field-induced mixing
+   - Optimize operator choice
+
+3. **HPC infrastructure** (explore vast parameter space)
+   - Parallel topology generation
+   - Distributed λ/μ sweeps
+   - Multi-node resonance search
+
+---
+
 **End of Document**

@@ -175,30 +175,135 @@ class AvoidedCrossing:
     level2_idx: int  # Index of second energy level
     min_gap: float  # Minimum energy gap
     gap_derivative: float  # Rate of gap closure
+    eigenvector_mixing: float = 0.0  # Max off-diagonal overlap (0-1)
+    is_true_crossing: bool = True  # True if eigenvector tracking confirms
     
     def is_strong_resonance(self, threshold: float = 0.1) -> bool:
         """Check if this is a strong resonance (small gap, large derivative)."""
         return self.min_gap < threshold and abs(self.gap_derivative) > 1.0
 
 
+def compute_eigenvector_overlap_matrix(
+    eigenvectors_prev: np.ndarray,
+    eigenvectors_next: np.ndarray
+) -> np.ndarray:
+    """
+    Compute overlap matrix between eigenvectors at consecutive parameter values.
+    
+    Overlap[i,j] = |⟨ψ_i(μ_k) | ψ_j(μ_{k+1})⟩|
+    
+    For adiabatic evolution, diagonal dominates (states track continuously).
+    For avoided crossings, off-diagonal elements become large (states swap).
+    
+    Args:
+        eigenvectors_prev: Eigenvectors at parameter value k (columns)
+        eigenvectors_next: Eigenvectors at parameter value k+1 (columns)
+    
+    Returns:
+        Overlap matrix of shape (n_levels, n_levels)
+    """
+    # Inner product: ⟨ψ_i | ψ_j⟩ = ψ_i† @ ψ_j
+    overlap = np.abs(eigenvectors_prev.conj().T @ eigenvectors_next)
+    return overlap
+
+
+def track_eigenvector_continuity(
+    eigenvector_sequence: List[np.ndarray],
+    parameter_values: np.ndarray
+) -> Tuple[np.ndarray, List[np.ndarray]]:
+    """
+    Track eigenvector identity across parameter sweep using overlap tracking.
+    
+    This reorders eigenvectors at each step to maintain continuity, preventing
+    false crossings from eigenvector label swapping.
+    
+    Args:
+        eigenvector_sequence: List of eigenvector arrays (one per parameter value)
+        parameter_values: Parameter values
+    
+    Returns:
+        (reordered_indices, overlap_matrices)
+        - reordered_indices[k, i]: original index of level i at parameter k
+        - overlap_matrices: List of overlap matrices between consecutive steps
+    """
+    n_params = len(parameter_values)
+    n_levels = eigenvector_sequence[0].shape[1]
+    
+    reordered_indices = np.zeros((n_params, n_levels), dtype=int)
+    overlap_matrices = []
+    
+    # First parameter: identity mapping
+    reordered_indices[0, :] = np.arange(n_levels)
+    
+    # Track continuity
+    current_order = np.arange(n_levels)
+    
+    for k in range(1, n_params):
+        # Compute overlap matrix
+        overlap = compute_eigenvector_overlap_matrix(
+            eigenvector_sequence[k-1][:, current_order],
+            eigenvector_sequence[k]
+        )
+        overlap_matrices.append(overlap)
+        
+        # Find best matching: maximize overlap on diagonal
+        # Use Hungarian algorithm approximation: greedy row-by-row
+        used = set()
+        new_order = np.zeros(n_levels, dtype=int)
+        
+        for i in range(n_levels):
+            # For state i at step k-1, find best match at step k
+            overlaps_i = overlap[i, :]
+            
+            # Set used states to -inf
+            for j in used:
+                overlaps_i[j] = -np.inf
+            
+            # Best match
+            j_best = np.argmax(overlaps_i)
+            new_order[i] = j_best
+            used.add(j_best)
+        
+        current_order = new_order
+        reordered_indices[k, :] = current_order
+    
+    return reordered_indices, overlap_matrices
+
+
 def detect_avoided_crossings(
     parameter_values: np.ndarray,
     energy_spectra: np.ndarray,
-    min_gap_threshold: float = 0.1
+    min_gap_threshold: float = 0.1,
+    eigenvector_sequence: Optional[List[np.ndarray]] = None,
+    use_eigenvector_tracking: bool = True,
+    min_parameter_separation: float = 0.01
 ) -> List[AvoidedCrossing]:
     """
-    Detect avoided crossings in energy level diagram.
+    Detect avoided crossings in energy level diagram with eigenvector tracking.
+    
+    Enhanced version that uses eigenvector overlap to distinguish true avoided
+    crossings from numerical noise and eigenvector label swaps.
     
     Args:
         parameter_values: Array of control parameter values
         energy_spectra: Array of shape (n_params, n_levels) with energy levels
         min_gap_threshold: Minimum gap to consider as avoided crossing
+        eigenvector_sequence: List of eigenvector arrays (for tracking)
+        use_eigenvector_tracking: If True, validate crossings with eigenvector overlap
+        min_parameter_separation: Minimum μ separation between crossings (filter duplicates)
     
     Returns:
-        List of detected avoided crossings
+        List of detected avoided crossings (filtered and validated)
     """
     crossings = []
     n_params, n_levels = energy_spectra.shape
+    
+    # Track eigenvector continuity if available
+    overlap_matrices = []
+    if use_eigenvector_tracking and eigenvector_sequence is not None:
+        _, overlap_matrices = track_eigenvector_continuity(
+            eigenvector_sequence, parameter_values
+        )
     
     # For each pair of levels, look for close approaches
     for i in range(n_levels):
@@ -214,16 +319,57 @@ def detect_avoided_crossings(
                         # Estimate derivative
                         dgap_dp = (gap[k+1] - gap[k-1]) / (parameter_values[k+1] - parameter_values[k-1])
                         
+                        # Eigenvector mixing (if available)
+                        mixing = 0.0
+                        is_true = True
+                        
+                        if use_eigenvector_tracking and len(overlap_matrices) > 0:
+                            if k-1 < len(overlap_matrices):
+                                # Check off-diagonal overlap between levels i and j
+                                overlap = overlap_matrices[k-1]
+                                mixing = max(overlap[i, j], overlap[j, i])
+                                
+                                # True crossing: large off-diagonal overlap
+                                # Numerical noise: diagonal dominates
+                                is_true = mixing > 0.1  # Threshold for true crossing
+                        
                         crossing = AvoidedCrossing(
                             parameter_value=parameter_values[k],
                             level1_idx=i,
                             level2_idx=j,
                             min_gap=gap[k],
-                            gap_derivative=dgap_dp
+                            gap_derivative=dgap_dp,
+                            eigenvector_mixing=mixing,
+                            is_true_crossing=is_true
                         )
-                        crossings.append(crossing)
+                        
+                        # Only add if validated as true crossing
+                        if not use_eigenvector_tracking or is_true:
+                            crossings.append(crossing)
     
-    return crossings
+    # Filter duplicate crossings (same levels, nearby parameter values)
+    filtered_crossings = []
+    
+    for crossing in crossings:
+        # Check if too close to existing crossing for same level pair
+        is_duplicate = False
+        for existing in filtered_crossings:
+            if (existing.level1_idx == crossing.level1_idx and
+                existing.level2_idx == crossing.level2_idx):
+                # Same level pair
+                param_diff = abs(existing.parameter_value - crossing.parameter_value)
+                if param_diff < min_parameter_separation:
+                    is_duplicate = True
+                    # Keep the one with smaller gap
+                    if crossing.min_gap < existing.min_gap:
+                        filtered_crossings.remove(existing)
+                        is_duplicate = False
+                    break
+        
+        if not is_duplicate:
+            filtered_crossings.append(crossing)
+    
+    return filtered_crossings
 
 
 # ============================================================================
@@ -241,13 +387,20 @@ class ResonanceSearcher:
     def sweep_polymer_parameter(
         self,
         mu_values: Optional[np.ndarray] = None,
-        external_field: float = 0.0
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        external_field: float = 0.0,
+        store_eigenvectors: bool = True
+    ) -> Tuple[np.ndarray, np.ndarray, Optional[List[np.ndarray]]]:
         """
         Sweep polymer parameter μ and compute energy spectrum.
         
+        Args:
+            mu_values: Parameter values to sweep
+            external_field: External field strength
+            store_eigenvectors: If True, store eigenvectors for tracking
+        
         Returns:
-            (mu_values, energy_spectra)
+            (mu_values, energy_spectra, eigenvector_sequence)
+            - eigenvector_sequence is None if store_eigenvectors=False
         """
         if mu_values is None:
             mu_values = np.linspace(MU_MIN, min(MU_MAX, 3.0), 50)
@@ -255,6 +408,7 @@ class ResonanceSearcher:
         # Storage for spectra
         first_run = True
         energy_spectra = None
+        eigenvector_sequence = [] if store_eigenvectors else None
         
         for idx, mu in enumerate(mu_values):
             # Build Hamiltonian
@@ -265,7 +419,7 @@ class ResonanceSearcher:
             )
             
             # Diagonalize
-            eigenvalues, _ = ham.diagonalize()
+            eigenvalues, eigenvectors = ham.diagonalize()
             
             # Initialize storage
             if first_run:
@@ -273,25 +427,37 @@ class ResonanceSearcher:
                 first_run = False
             
             energy_spectra[idx, :] = eigenvalues
+            
+            # Store eigenvectors if requested
+            if store_eigenvectors:
+                eigenvector_sequence.append(eigenvectors)
         
-        return mu_values, energy_spectra
+        return mu_values, energy_spectra, eigenvector_sequence
     
     def sweep_external_field(
         self,
         field_values: Optional[np.ndarray] = None,
-        mu: float = MU_TYPICAL
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        mu: float = MU_TYPICAL,
+        store_eigenvectors: bool = True
+    ) -> Tuple[np.ndarray, np.ndarray, Optional[List[np.ndarray]]]:
         """
         Sweep external field strength and compute energy spectrum.
         
+        Args:
+            field_values: Field values to sweep
+            mu: Polymer parameter (fixed)
+            store_eigenvectors: If True, store eigenvectors for tracking
+        
         Returns:
-            (field_values, energy_spectra)
+            (field_values, energy_spectra, eigenvector_sequence)
+            - eigenvector_sequence is None if store_eigenvectors=False
         """
         if field_values is None:
             field_values = np.linspace(-1.0, 1.0, 50) * L_PLANCK**3
         
         first_run = True
         energy_spectra = None
+        eigenvector_sequence = [] if store_eigenvectors else None
         
         for idx, field in enumerate(field_values):
             ham = GeometricHamiltonian(
@@ -300,15 +466,19 @@ class ResonanceSearcher:
                 external_field=field
             )
             
-            eigenvalues, _ = ham.diagonalize()
+            eigenvalues, eigenvectors = ham.diagonalize()
             
             if first_run:
                 energy_spectra = np.zeros((len(field_values), len(eigenvalues)))
                 first_run = False
             
             energy_spectra[idx, :] = eigenvalues
+            
+            # Store eigenvectors if requested
+            if store_eigenvectors:
+                eigenvector_sequence.append(eigenvectors)
         
-        return field_values, energy_spectra
+        return field_values, energy_spectra, eigenvector_sequence
     
     def compute_susceptibility(
         self,
