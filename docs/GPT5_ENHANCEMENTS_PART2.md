@@ -912,22 +912,41 @@ Even the **400× octahedral boost** is insufficient. Would need:
 3. **Multiple strategies needed**: No single parameter provides enough gain
 4. **Direct visualization valuable**: Rabi curves make observability criterion transparent
 
-### Remaining High-Priority Work
+### Completed Work (All 6 GPT-5 Priorities) ✅
 
-1. **Crossing detection robustness** (computational efficiency)
-   - Eigenvector tracking: U_prev† @ U_next
-   - Mode identity continuity
-   - Expected: 16,256 → hundreds of true crossings
+1. ✅ **Density of states parameterization** (α parameter)
+2. ✅ **External field infrastructure** (H_ext support)
+3. ✅ **Systematic topology study** (400× octahedral boost!)
+4. ✅ **Driven response curves** (Rabi lineshapes)
+5. ✅ **Crossing detection robustness** (27× efficiency gain!)
+6. ✅ **Documentation updates** (comprehensive)
 
-2. **External field tuning** (could gain 10⁵-10¹⁰×)
-   - Set h_max ~ 0.1 × H_scale
-   - Test field-induced mixing
-   - Optimize operator choice
+### Immediate Next Steps (Highest Impact)
 
-3. **HPC infrastructure** (explore vast parameter space)
+1. **External field scaling optimization** (could gain 10⁵-10¹⁰×) ← **NEXT**
+   - Compute H_scale = mean(|H_geom|) from actual Hamiltonian
+   - Set h_max ~ 0.1 × H_scale (10% perturbation)
+   - Re-run field sweep with proper scaling
+   - Test field-induced level mixing
+   - Expected: 10⁵~10¹⁰× enhancement from optimized field
+
+2. **Expand coupling constant range** (10²~10⁴× expected)
+   - Current: λ ∈ [10⁻⁸, 10⁻⁴]
+   - Test: λ ∈ [10⁻⁶, 10⁻²] (stronger coupling)
+   - Verify perturbative regime still valid
+   - Expected: 10²~10⁴× from larger λ
+
+3. **Fix icosahedral topology generator** (2-10× expected)
+   - Debug edge generation (threshold issue)
+   - Test coordination=5 hypothesis
+   - Compare with octahedral baseline
+   - Expected: 2-10× if coordination matters
+
+4. **HPC infrastructure** (long-term, enables full exploration)
    - Parallel topology generation
-   - Distributed λ/μ sweeps
+   - Distributed (λ, μ, h) sweeps
    - Multi-node resonance search
+   - Expected: Explore 10⁶× more parameter space
 
 ---
 
