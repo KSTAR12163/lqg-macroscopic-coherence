@@ -42,8 +42,12 @@ print("\nPurcell enhancement: g_eff = √F_p × g_0")
 print("  → Boosts weak coupling through DOS engineering\n")
 
 # ============================================================================
-# PHYSICAL PARAMETERS (from Step 2)
+# PHYSICAL PARAMETERS (from Step 2) & NUMERICAL REALITY CHECK
 # ============================================================================
+
+# Threshold for effective coupling to be numerically meaningful
+G_EFF_THRESHOLD = 1e-50  # J
+
 
 # From phase_b_network_mapping.py results
 DELTA = 6.543e-16  # J (energy gap)
@@ -97,27 +101,33 @@ for F_p in PURCELL_FACTORS:
     g_eff = np.sqrt(F_p) * G0_BASE
     
     for gamma_gain in GAMMA_GAINS:
-        # Floquet analysis with enhanced coupling
-        config = FloquetScanConfig(
-            delta=DELTA,
-            g0=g_eff,
-            amplitude=AMPLITUDE,
-            omega=OMEGA_DRIVE,
-            gamma_gain=gamma_gain,
-            steps_per_period=200,
-            periods=1,
-        )
-        
-        growth_per_period, details = floquet_growth_rate(config)
-        
-        # Growth rate per time
-        growth_rate = growth_per_period * OMEGA_DRIVE / (2 * np.pi)
-        
-        # Time to close gap
-        if growth_rate > 1e-30:
-            time_to_1e14 = np.log(1e14) / growth_rate
-        else:
+        # --- NUMERICAL REALITY CHECK ---
+        if g_eff < G_EFF_THRESHOLD:
+            growth_rate = 0
             time_to_1e14 = np.inf
+            growth_per_period = 0
+        else:
+            # Floquet analysis with enhanced coupling
+            config = FloquetScanConfig(
+                delta=DELTA,
+                g0=g_eff,
+                amplitude=AMPLITUDE,
+                omega=OMEGA_DRIVE,
+                gamma_gain=gamma_gain,
+                steps_per_period=200,
+                periods=1,
+            )
+            
+            growth_per_period, details = floquet_growth_rate(config)
+            
+            # Growth rate per time
+            growth_rate = growth_per_period * OMEGA_DRIVE / (2 * np.pi)
+            
+            # Time to close gap
+            if growth_rate > 1e-30:
+                time_to_1e14 = np.log(1e14) / growth_rate
+            else:
+                time_to_1e14 = np.inf
         
         results.append({
             'F_p': F_p,
@@ -166,17 +176,12 @@ for target_name, target_time in targets.items():
         # Find minimum Purcell factor needed
         best = min(viable, key=lambda r: r['F_p'])
         
-        print(f"\n✅ ACHIEVABLE with:")
-        print(f"  Minimum F_p:      {best['F_p']:.3e}")
+        print(f"  Minimum F_p:      {best['F_p']:.3e} (g_eff = {best['g_eff']:.3e} J)")
         print(f"  Required γ_gain:  {best['gamma_gain']:.3e}")
-        print(f"  Effective g_eff:  {best['g_eff']:.3e} J")
-        print(f"  Enhancement:      {best['g_eff']/G0_BASE:.3e}× over bare")
-        print(f"  Growth rate:      {best['growth_rate']:.3e} s^-1")
-        print(f"  Time to 10^14×:   {best['time_to_1e14']:.3e} s")
         
         # Technology assessment
-        if best['F_p'] < 1e3:
-            tech = "✅ STANDARD (optical cavity)"
+        if best['g_eff'] < G_EFF_THRESHOLD:
+            tech = "❌ NUMERICALLY UNSTABLE"
         elif best['F_p'] < 1e6:
             tech = "✅ ACHIEVABLE (high-Q cavity, current tech)"
         elif best['F_p'] < 1e9:
@@ -187,10 +192,10 @@ for target_name, target_time in targets.items():
             tech = "❌ NOT VIABLE (beyond current technology)"
         
         print(f"\n  Technology level: {tech}")
-        
+
         # Show top 5 configurations
         viable_sorted = sorted(viable, key=lambda r: r['F_p'])
-        print(f"\n  Top 5 configurations:")
+        print(f"\n  Top 5 viable configurations:")
         print(f"  {'F_p':<12} {'γ_gain':<12} {'g_eff':<12} {'Time (years)':<15}")
         print(f"  {'-'*60}")
         for r in viable_sorted[:5]:
@@ -198,8 +203,15 @@ for target_name, target_time in targets.items():
             print(f"  {r['F_p']:<12.2e} {r['gamma_gain']:<12.2e} "
                   f"{r['g_eff']:<12.2e} {years:<15.3e}")
     else:
-        print(f"\n❌ NOT ACHIEVABLE (F_p up to 10^20 insufficient)")
-        print(f"   Need higher gain or different approach")
+        print(f"\n❌ NOT ACHIEVABLE within this F_p scan (up to 10^20)")
+        # Check if any result was ever numerically stable
+        stable_results = [r for r in results if r['g_eff'] >= G_EFF_THRESHOLD]
+        if not stable_results:
+            print(f"   → All tested g_eff were below the numerical threshold of {G_EFF_THRESHOLD:.1e} J.")
+            min_Fp_for_stability = (G_EFF_THRESHOLD / G0_BASE)**2
+            print(f"   → Minimum F_p for numerical stability: {min_Fp_for_stability:.1e}")
+        else:
+            print(f"   → Need higher gain, different drive, or larger F_p.")
 
 # ============================================================================
 # BEST OVERALL RESULT
