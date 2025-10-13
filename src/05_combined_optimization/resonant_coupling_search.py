@@ -58,7 +58,8 @@ def compute_coupling_at_resonance(
     lambda_val: float,
     level1: int,
     level2: int,
-    dim: int = 32
+    dim: int = 32,
+    rho_exponent: float = 1.0
 ) -> Tuple[float, float]:
     """
     Compute matter-geometry coupling strength at a specific resonance.
@@ -70,9 +71,19 @@ def compute_coupling_at_resonance(
         lambda_val: Coupling constant
         level1, level2: Resonant energy levels
         dim: Hilbert space dimension
+        rho_exponent: Density of states model ρ ~ 1/gap^α
+            - α=1: Physical default (matches level spacing)
+            - α=2: Previous default (emphasizes near-degeneracy)
     
     Returns:
         (coupling_strength, driven_rate) in Joules and Hz
+        
+    Notes:
+        Driven rate via Fermi's golden rule: Γ ~ (2π/ħ) |⟨f|H_int|i⟩|² ρ(E)
+        With ρ ~ 1/gap^α, we have Γ ~ |M|²/gap^α
+        Physical interpretation:
+          - α=1: Standard density of states for 1D level spacing
+          - α>1: Heuristic to emphasize tiny gaps during exploration
     """
     # Build coupling Hamiltonian at this μ
     coupling = MatterGeometryCoupling(
@@ -94,10 +105,10 @@ def compute_coupling_at_resonance(
     
     # Estimate driven rate via Fermi's golden rule
     # Γ ~ (2π/ħ) |⟨f|H_int|i⟩|² ρ(E)
-    # Density of states (simplified)
+    # Density of states model: ρ ~ 1/gap^α (configurable)
     energy_gap = abs(eigenvalues[level2] - eigenvalues[level1])
     if energy_gap > 0:
-        rho_states = 1.0 / energy_gap**2
+        rho_states = 1.0 / energy_gap**rho_exponent
     else:
         rho_states = 0.0
     
@@ -113,7 +124,8 @@ def combined_resonance_coupling_search(
     lambda_range: Tuple[float, float] = (1e-8, 1e-4),
     n_lambda: int = 10,
     min_gap_threshold: float = 1e-37,
-    dim: int = 32
+    dim: int = 32,
+    rho_exponent: float = 1.0
 ) -> List[ResonantCouplingPoint]:
     """
     Search for combined resonance + strong coupling "sweet spots".
@@ -129,6 +141,7 @@ def combined_resonance_coupling_search(
         n_lambda: Number of λ samples
         min_gap_threshold: Threshold for resonance detection
         dim: Hilbert space dimension
+        rho_exponent: Density of states exponent (α=1 physical, α=2 gap-emphasis)
     
     Returns:
         List of ResonantCouplingPoint objects ranked by figure of merit
@@ -139,7 +152,8 @@ def combined_resonance_coupling_search(
     print(f"\nSearching for parameter 'sweet spots' (μ*, λ*) where:")
     print("  1. Geometric resonance exists (avoided crossing)")
     print("  2. Matter-geometry coupling is strong (|⟨f|H_int|i⟩| >> 0)")
-    print("  3. Driven rate exceeds decoherence (Γ_driven >> γ)\n")
+    print("  3. Driven rate exceeds decoherence (Γ_driven >> γ)")
+    print(f"\nDensity of states model: ρ ~ 1/gap^{rho_exponent} ({'physical' if abs(rho_exponent - 1.0) < 0.01 else 'gap-emphasis'})\n")
     
     results = []
     
@@ -192,7 +206,7 @@ def combined_resonance_coupling_search(
             for lambda_val in lambda_values:
                 coupling_strength, driven_rate = compute_coupling_at_resonance(
                     network, mu_res, matter_field, lambda_val,
-                    level1, level2, dim
+                    level1, level2, dim, rho_exponent
                 )
                 
                 if coupling_strength > best_coupling:

@@ -107,13 +107,15 @@ class MatterGeometryCoupling:
     """
     Interaction between matter and quantum geometry.
     
-    H = H_geom + H_matter + H_int
+    H = H_geom + H_matter + H_int + H_ext
     H_int = λ O_geom ⊗ O_matter
+    H_ext = h × O_ext  (external field perturbation)
     """
     network: SpinNetwork
     matter_field: MatterFieldProperties
     coupling_constant: float  # λ
     mu: float = MU_TYPICAL
+    external_field: float = 0.0  # h (external field strength)
     
     def build_geometry_operator(self, dim: int) -> np.ndarray:
         """
@@ -165,6 +167,26 @@ class MatterGeometryCoupling:
         
         return O_matter
     
+    def build_external_field_operator(self, dim: int) -> np.ndarray:
+        """
+        External field operator O_ext (breaks degeneracies, induces mixing).
+        
+        Uses a simple diagonal + off-diagonal form to perturb energy levels.
+        """
+        O_ext = np.zeros((dim, dim), dtype=complex)
+        
+        # Diagonal: linear field gradient
+        for i in range(dim):
+            O_ext[i, i] = L_PLANCK**3 * i / dim
+        
+        # Off-diagonal: coupling between levels (induced mixing)
+        coupling_strength = 0.1 * L_PLANCK**3
+        for i in range(dim - 1):
+            O_ext[i, i+1] = coupling_strength
+            O_ext[i+1, i] = coupling_strength
+        
+        return O_ext
+    
     def build_interaction_hamiltonian(self, dim: int) -> np.ndarray:
         """
         Build H_int = λ O_geom ⊗ O_matter.
@@ -181,7 +203,7 @@ class MatterGeometryCoupling:
     
     def build_full_hamiltonian(self, dim: int = 32) -> np.ndarray:
         """
-        Build H = H_geom + H_matter + H_int.
+        Build H = H_geom + H_matter + H_int + H_ext.
         """
         O_geom = self.build_geometry_operator(dim)
         O_matter = self.build_matter_operator(dim)
@@ -189,10 +211,15 @@ class MatterGeometryCoupling:
         
         H = O_geom + O_matter + H_int
         
-        # Ensure Hermitian
-        H = (H + H.T) / 2
+        # Add external field perturbation
+        if abs(self.external_field) > 1e-30:
+            O_ext = self.build_external_field_operator(dim)
+            H += self.external_field * O_ext
         
-        return H
+        # Ensure Hermitian
+        H = (H + H.T.conj()) / 2
+        
+        return H.real
     
     def compute_energy_spectrum(self, dim: int = 32) -> Tuple[np.ndarray, np.ndarray]:
         """
