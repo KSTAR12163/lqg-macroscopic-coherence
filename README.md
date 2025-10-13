@@ -87,21 +87,34 @@ such that:
 
 ## Status
 
-**Phase B BREAKTHROUGH (Oct 13, 2025)** - 🚀 **EXPONENTIAL AMPLIFICATION DISCOVERED!**
+**Phase B-C: NUMERICAL ARTIFACT IDENTIFIED (Oct 13, 2025)** - ⚠️ **CORRECTED ANALYSIS**
 
-### Phase B: Active Gain Mechanism
+### Phase B: Active Gain Mechanism (CORRECTED)
 
-**CRITICAL DISCOVERY**: Active gain (population inversion) produces **exponential amplification**!
+**INITIAL CLAIM (INCORRECT)**: Exponential amplification with F_p ~ 1 makes warp viable
 
-**Key Results**:
-- ✅ Floquet instability analysis: Growth with PT-symmetric gain
-- ✅ Growth-per-time optimization: **2 years to close 10¹⁴× gap** (with γ_gain ~ 10⁻⁶)
-- ✅ Pumped Lindblad dynamics: Demonstrated exponential growth (γ_pump > γ_decay)
-- 🎯 **First mechanism that actually WORKS for amplification!**
+**CORRECTED ASSESSMENT**: Initial "breakthrough" was a **numerical artifact**
+- Bare coupling g₀ ≈ 10⁻¹²¹ J is below floating-point precision
+- Hamiltonian becomes effectively diagonal (no actual coupling)
+- "Growth" came from gain acting on isolated level, not transition amplification
+- **Required Purcell factor**: F_p ~ 10¹⁴¹ (physically impossible!)
 
-**Status**: Principle proven, engineering required (Purcell enhancement, gain optimization)
+**What We Actually Confirmed**:
+- ✅ Active gain mechanism is correct (population inversion works)
+- ✅ Floquet/Lindblad framework is valid (mathematical tools work)
+- ✅ Engineering approach is sound (cavity QED + pump)
+- ❌ **Current LQG model insufficient** (g₀ too weak by ~70 orders of magnitude)
 
-**Documentation**: `docs/PHASE_B_BREAKTHROUGH.md` (comprehensive analysis)
+**Phase C: Sensitivity Analysis**:
+- Target for viability: g₀ ≥ 10⁻⁵⁰ J (with realistic F_p ~ 10⁶, γ ~ 10⁻⁴)
+- Current model: g₀ ≈ 10⁻¹²¹ J
+- **Gap**: Factor of ~10⁷¹ (fundamental physics problem, not engineering)
+
+**Status**: Moving to Phase D - Theoretical search for enhanced coupling mechanisms
+
+**Documentation**: 
+- `docs/PHASE_B_CORRECTED_ANALYSIS.md` (artifact identification)
+- `docs/PHASE_D_THEORETICAL_ROADMAP.md` (path forward)
 
 ---
 

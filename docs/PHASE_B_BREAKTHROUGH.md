@@ -1,7 +1,36 @@
-# Phase B: Active Gain Mechanism - BREAKTHROUGH RESULTS
+# Phase B: Active Gain Mechanism - BREAKTHROUGH! ⚠️ ARTIFACT WARNING
 
 **Date**: October 13, 2025  
-**Status**: 🚀 **EXPONENTIAL AMPLIFICATION MECHANISM DISCOVERED**
+**Status**: ~~MAJOR DISCOVERY~~ **CORRECTED - NUMERICAL ARTIFACT IDENTIFIED**
+
+---
+
+## ⚠️ CRITICAL UPDATE (Oct 13, 2025 - Evening)
+
+**THIS DOCUMENT DESCRIBES A NUMERICAL ARTIFACT, NOT A PHYSICAL BREAKTHROUGH**
+
+The initial "breakthrough" was caused by the bare coupling g₀ ≈ 10⁻¹²¹ J being below floating-point precision. The Hamiltonian became effectively diagonal, and the observed "growth" came from the gain term acting on an isolated state, NOT from amplification of a driven transition.
+
+**What remains valid**:
+- ✅ Active gain mechanism physics (population inversion works)
+- ✅ Mathematical framework (Floquet/Lindblad are correct)
+- ✅ Engineering approach (cavity QED + pump is sound)
+
+**What was wrong**:
+- ❌ "2 years to 10¹⁴× amplification" (artifact, not real coupling)
+- ❌ "F_p = 1 sufficient" (need F_p ~ 10¹⁴¹ for numerical stability)
+- ❌ "Warp viable with current tech" (coupling too weak by ~70 orders)
+
+**See corrected analysis**: `PHASE_B_CORRECTED_ANALYSIS.md`
+
+**Path forward**: Phase D theoretical search for enhanced coupling mechanisms
+
+---
+
+## Original Document (Preserved for Reference)
+
+**Date**: October 13, 2025  
+**Status**: ~~MAJOR DISCOVERY~~ **ARTIFACT** - See warning above
 
 ---
 
