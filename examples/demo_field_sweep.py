@@ -1,5 +1,5 @@
 """
-Demo: 2D (μ, external field) sweep for enhanced coupling (GPT-5 Priority #1).
+Demo: 2D (μ, external field) sweep for enhanced coupling (researcher Priority #1).
 
 Tests whether external field perturbation can break degeneracies and induce
 mixing to achieve observable coupling: Γ_driven/γ ≥ 10.
@@ -26,7 +26,7 @@ analyze_field_enhancement = field_sweep_module.analyze_field_enhancement
 def main():
     """Run 2D field sweep demonstration."""
     print("╔" + "=" * 78 + "╗")
-    print("║ 2D (μ, EXTERNAL FIELD) SWEEP - GPT-5 Priority #1                          ║")
+    print("║ 2D (μ, EXTERNAL FIELD) SWEEP - researcher Priority #1                          ║")
     print("║ Test: Can external fields break degeneracies and enhance coupling?        ║")
     print("╚" + "=" * 78 + "╝")
     
@@ -43,7 +43,7 @@ def main():
     
     print(f"  ✓ {len(network.nodes)} nodes, {len(network.edges)} edges")
     
-    # Parameter grids (GPT-5 recommended: μ×200, h×20)
+    # Parameter grids (researcher recommended: μ×200, h×20)
     print("\nSetting up parameter grids...")
     mu_values = np.linspace(1e-3, 3.0, 200)  # Extended μ range
     
@@ -89,7 +89,7 @@ def main():
         print("   - Widen μ range")
         print("   - Test different network topologies")
     
-    # Acceptance criterion (GPT-5 recommendation)
+    # Acceptance criterion (researcher recommendation)
     print("\n" + "=" * 80)
     print("ACCEPTANCE CRITERION (GPT-5)")
     print("=" * 80)
@@ -115,7 +115,7 @@ def main():
             print("\n⚠️  PARTIAL PROGRESS: SNR ≥ 10⁻⁶ (continue optimization)")
         else:
             print(f"\n✗ INSUFFICIENT: SNR = {snr:.2e} << 10⁻⁶")
-            print("   Recommend: Try topology study (GPT-5 Priority #2)")
+            print("   Recommend: Try topology study (researcher Priority #2)")
     
     print("\n" + "=" * 80)
     print("NEXT STEPS")

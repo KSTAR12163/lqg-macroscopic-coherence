@@ -24,7 +24,7 @@
 
 ## Complete Test Results
 
-### Test A: λ Extension (GPT-5 Priority) ✅
+### Test A: λ Extension (researcher Priority) ✅
 
 **Question**: Can we push λ beyond 10⁻² while staying perturbative?
 
@@ -45,7 +45,7 @@
 
 ---
 
-### Test B: N-Scaling (GPT-5 Priority #1) ❌
+### Test B: N-Scaling (researcher Priority #1) ❌
 
 **Question**: Does coupling scale superlinearly with network size N?
 

@@ -2,7 +2,7 @@
 
 ## Summary
 
-This document details critical bug fixes and improvements based on GPT-5's assessment of the LQG macroscopic coherence framework.
+This document details critical bug fixes and improvements based on researcher assessment of the LQG macroscopic coherence framework.
 
 ## Critical Bugs Fixed
 

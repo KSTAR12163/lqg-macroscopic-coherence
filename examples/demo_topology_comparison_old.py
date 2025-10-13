@@ -1,5 +1,5 @@
 """
-Demo: Systematic topology comparison (GPT-5 Priority #1 - HIGHEST IMPACT).
+Demo: Systematic topology comparison (researcher Priority #1 - HIGHEST IMPACT).
 
 Tests whether network structure determines coupling strength.
 Goal: Find topologies with |⟨f|H_int|i⟩| ≥ 10^20× tetrahedral baseline.
@@ -35,7 +35,7 @@ def compare_topologies():
       3. Compare to tetrahedral baseline
     """
     print("╔" + "=" * 78 + "╗")
-    print("║ SYSTEMATIC TOPOLOGY COMPARISON - GPT-5 Priority #1 (HIGHEST IMPACT)       ║")
+    print("║ SYSTEMATIC TOPOLOGY COMPARISON - researcher Priority #1 (HIGHEST IMPACT)       ║")
     print("║ Goal: Find topologies with |⟨f|H_int|i⟩| ≥ 10²⁰× tetrahedral baseline     ║")
     print("╚" + "=" * 78 + "╝")
     
@@ -164,7 +164,7 @@ def compare_topologies():
     
     # Check for acceptance criterion
     print("\n" + "=" * 80)
-    print("ACCEPTANCE CRITERION (GPT-5)")
+    print("ACCEPTANCE CRITERION (researcher)")
     print("=" * 80)
     print("\nGoal: Find topology with |M| ≥ 10²⁰× tetrahedral baseline")
     
@@ -289,7 +289,7 @@ def main():
         # If tetrahedral is best, topology didn't help
         if 'tetrahedral' in best_topo:
             print("\n1. ⚠️  Tetrahedral remains best → topology alone insufficient")
-            print("2. Try: External field perturbation (GPT-5 Priority #2)")
+            print("2. Try: External field perturbation (researcher Priority #2)")
             print("3. Try: Different H_int operators (volume vs area vs curvature)")
             print("4. Try: Larger coupling constants λ ∈ [1e-6, 1e-2]")
         else:

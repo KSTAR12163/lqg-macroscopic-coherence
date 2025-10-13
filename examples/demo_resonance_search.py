@@ -52,12 +52,12 @@ def main():
     print(f"Hamiltonian dimension: {H.shape[0]} × {H.shape[1]}\n")
     
     # ========================================================================
-    # 3. Perform parameter sweep (higher resolution per GPT-5)
+    # 3. Perform parameter sweep (higher resolution per researcher)
     # ========================================================================
     print("Performing parameter sweep over μ (high resolution)...")
     searcher = ResonanceSearcher(network)
     
-    # GPT-5: Increase resolution to 100+ points for better detection
+    # researcher: Increase resolution to 100+ points for better detection
     mu_values = np.linspace(0.01, 1.0, 100)
     
     mu_vals, energy_spectra = searcher.sweep_polymer_parameter(mu_values, external_field=0.0)
@@ -76,7 +76,7 @@ def main():
     print("-" * 60)
     
     if len(avoided_crossings) == 0:
-        # GPT-5: Provide actionable next steps when none found
+        # researcher: Provide actionable next steps when none found
         print("  (None detected with current threshold and resolution)")
         print("\n  Next probes to try:")
         print("  • Increase μ resolution (current: 100 points)")
@@ -115,7 +115,7 @@ def main():
     # Compute and plot susceptibility
     susceptibility = searcher.compute_susceptibility(mu_vals, energy_spectra)
     
-    # GPT-5: Identify susceptibility peaks (more robust than gap detection)
+    # researcher: Identify susceptibility peaks (more robust than gap detection)
     print("\nSusceptibility Analysis:")
     print("-" * 60)
     max_susceptibilities = np.max(np.abs(susceptibility), axis=0)

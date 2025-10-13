@@ -114,7 +114,7 @@ With λ=1.0 validated:
 
 ---
 
-## What This Means for GPT-5's Paths
+## What This Means for researcher's Paths
 
 ### Path 1: New Physics Investigation
 **More promising now!**
@@ -196,7 +196,7 @@ With 10¹³× gap instead of 10¹⁵×:
 
 ## Updated Recommendation
 
-### GPT-5 Path 1 is NOW MORE VIABLE
+### researcher Path 1 is NOW MORE VIABLE
 
 **Before**: Needed 10¹⁵× from new physics (impossible)  
 **After**: Need 10¹³× from new physics (plausible!)

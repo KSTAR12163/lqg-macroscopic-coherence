@@ -28,7 +28,7 @@ compute_transition_rates = coupling_module.compute_transition_rates
 plot_coupling_comparison = coupling_module.plot_coupling_comparison
 plot_impedance_analysis = coupling_module.plot_impedance_analysis
 
-# Import driven Lindblad evolution (GPT-5 suggestion)
+# Import driven Lindblad evolution (researcher suggestion)
 lindblad_module = importlib.import_module('src.04_coupling_engineering.driven_lindblad')
 lindblad_evolution = lindblad_module.lindblad_evolution
 plot_driven_evolution = lindblad_module.plot_driven_evolution
@@ -175,10 +175,10 @@ def main():
     print(f"4. Reflection coefficients range from {comparison_data[0]['reflection']:.3f} to {comparison_data[-1]['reflection']:.3f}")
     
     # ========================================================================
-    # 8. Driven evolution with decoherence (GPT-5 addition)
+    # 8. Driven evolution with decoherence (researcher addition)
     # ========================================================================
     print(f"\n{'=' * 80}")
-    print("DRIVEN EVOLUTION WITH DECOHERENCE (GPT-5 enhancement)")
+    print("DRIVEN EVOLUTION WITH DECOHERENCE (researcher enhancement)")
     print("=" * 80)
     print("\nSimulating realistic driven transitions including decoherence...\n")
     

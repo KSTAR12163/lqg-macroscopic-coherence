@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-GPT-5 Theory Priority #1: N-Scaling Analysis
+researcher Theory Priority #1: N-Scaling Analysis
 
 CRITICAL QUESTION: Does f_eff scale superlinearly with network size N?
 
@@ -31,7 +31,7 @@ MatterGeometryCoupling = matter_coupling_module.MatterGeometryCoupling
 print("=" * 80)
 print("CRITICAL THEORY TEST: N-SCALING ANALYSIS")
 print("=" * 80)
-print("\nGPT-5 Question: Does coupling scale superlinearly with network size?")
+print("\nresearcher Question: Does coupling scale superlinearly with network size?")
 print("\nScaling laws to test:")
 print("  • f_eff ∝ N⁰ (saturation) → Dead end")
 print("  • f_eff ∝ N¹ (linear) → Need N ~ 10¹³ → Impossible")

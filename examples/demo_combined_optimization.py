@@ -27,7 +27,7 @@ MATTER_FIELDS = coupling_module.MATTER_FIELDS
 
 def main():
     print("=" * 80)
-    print("GEMINI 2.5 PRO PRIORITY #1: COMBINED RESONANCE + COUPLING OPTIMIZATION")
+    print("researcher PRIORITY #1: COMBINED RESONANCE + COUPLING OPTIMIZATION")
     print("=" * 80)
     print("\nObjective: Find parameter 'sweet spots' (μ*, λ*) where:")
     print("  • Geometric resonance exists (avoided crossing)")
@@ -46,9 +46,8 @@ def main():
     ]
     for (i, j, spin) in edges:
         network.add_edge(i, j, spin)
-    
+
     print(f"Test network: {len(network.nodes)} nodes, {len(network.edges)} edges\n")
-    
     # ========================================================================
     # 2. Parameter sweep (wider range per Gemini recommendation)
     # ========================================================================

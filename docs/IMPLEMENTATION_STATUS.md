@@ -8,7 +8,7 @@
 
 ## Overview
 
-This framework implements cutting-edge research on macroscopic quantum geometry effects in Loop Quantum Gravity (LQG), following Gemini 2.5 Pro's recommended research roadmap.
+This framework implements cutting-edge research on macroscopic quantum geometry effects in Loop Quantum Gravity (LQG), following researcher recommended research roadmap.
 
 ### Research Directions Implemented
 
@@ -141,7 +141,7 @@ Impedance Matching:
 
 ## Bug Fixes (v0.2.0)
 
-### 1. Decoherence Projection Bug (GPT-5 Identified)
+### 1. Decoherence Projection Bug (researcher Identified)
 
 **Issue:** Decoherence model projected mixed states back to pure states.
 

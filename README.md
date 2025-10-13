@@ -314,7 +314,7 @@ Radius r | No reduction | ×10⁻⁶       | ×10⁻¹²      | ×10⁻²⁴
 
 ### ✅ Bug Fixes (v0.2.0)
 
-**Critical Decoherence Bug** (identified by GPT-5):
+**Critical Decoherence Bug** (identified by researcher):
 - **Issue**: Mixed states projected back to pure states during decoherence
 - **Fix**: Refactored to density matrix evolution (ρ → UρU†, no projection)
 - **Validation**: Purity now correctly decreases (1.0 → 0.99 for γ=0.001)
@@ -527,7 +527,7 @@ This framework provides theoretical foundation for:
 
 ## Current Status
 
-**Overall**: ✅ **ALL GPT-5 HIGH-PRIORITY IMPLEMENTATIONS COMPLETE**
+**Overall**: ✅ **ALL researcher HIGH-PRIORITY IMPLEMENTATIONS COMPLETE**
 
 **Version**: 0.5.0 (Production-ready research framework)
 
@@ -553,14 +553,14 @@ This framework provides theoretical foundation for:
 - v0.1.0: Initial framework (Directions #1-2)
 - v0.2.0: Bug fixes (decoherence, thermal normalization)
 - v0.3.0: Advanced modules (Directions #3-4, SymPy integration)
-- v0.4.0: Combined optimization framework (Gemini implementation)
-- **v0.5.0: GPT-5 enhancements complete (topology, driven response, robust detection)** ← Current
+- v0.4.0: Combined optimization framework (researcher implementation)
+- **v0.5.0: researcher enhancements complete (topology, driven response, robust detection)** ← Current
 
 **Documentation**:
-- `docs/FINAL_IMPLEMENTATION_SUMMARY.md`: Complete GPT-5 implementations
+- `docs/FINAL_IMPLEMENTATION_SUMMARY.md`: Complete researcher implementations
 - `docs/COMPLETE_IMPLEMENTATION_SUMMARY.md`: Comprehensive technical details
-- `docs/GPT5_ENHANCEMENTS_PART2.md`: Enhancement descriptions and results
-- `docs/GEMINI_IMPLEMENTATION.md`: Combined optimization framework
+- `docs/researcher_ENHANCEMENTS_PART2.md`: Enhancement descriptions and results
+- `docs/researcher_IMPLEMENTATION.md`: Combined optimization framework
 
 **Next Steps**:
 - External field scaling optimization (h_max ~ 0.1 × H_scale)

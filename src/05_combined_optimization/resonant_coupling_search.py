@@ -1,5 +1,5 @@
 """
-Combined resonance and coupling optimization (Gemini 2.5 Pro recommendation).
+Combined resonance and coupling optimization (researcher recommendation).
 
 This module implements the critical next step: finding parameter "sweet spots" (μ*, λ*)
 where geometric resonances (Direction #3) dramatically enhance matter-geometry
@@ -378,7 +378,7 @@ def analyze_top_candidates(
 def demonstrate_combined_optimization():
     """Demonstration of combined resonance + coupling optimization."""
     print("\n" + "=" * 80)
-    print("GEMINI 2.5 PRO RECOMMENDATION: COMBINED OPTIMIZATION")
+    print("researcher RECOMMENDATION: COMBINED OPTIMIZATION")
     print("=" * 80)
     print("\nFinding parameter 'sweet spots' where resonances enhance coupling...\n")
     
@@ -394,7 +394,7 @@ def demonstrate_combined_optimization():
     
     print(f"Test network: {len(network.nodes)} nodes, {len(network.edges)} edges")
     
-    # Parameter sweep (wider range per Gemini suggestion)
+    # Parameter sweep (wider range per researcher suggestion)
     mu_values = np.linspace(0.001, 3.0, 150)  # Extended range
     
     # Run combined optimization

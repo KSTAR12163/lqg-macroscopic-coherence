@@ -9,7 +9,7 @@
 ## Current Status (October 2025)
 
 **Phase**: Advanced numerical exploration phase
-**Progress**: Framework v0.5.0 complete with all GPT-5 enhancements
+**Progress**: Framework v0.5.0 complete with all researcher enhancements
 **Key Findings**:
 - ✅ Octahedral topology: 400× coupling boost discovered
 - ✅ Robust crossing detection: 27× efficiency improvement

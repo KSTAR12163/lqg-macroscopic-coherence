@@ -1,14 +1,14 @@
 # Journey Continuation: External Field Optimization
 
 **Date**: October 12, 2025  
-**Phase**: Post-GPT-5 Enhancements  
+**Phase**: Post-researcher Enhancements  
 **Current Focus**: External field scaling optimization
 
 ---
 
 ## Current Status Review
 
-### Completed (All 6 GPT-5 Priorities) ✅
+### Completed (All 6 researcher Priorities) ✅
 
 1. ✅ **Density of States Parameterization**: ρ ~ 1/gap^α, configurable α
 2. ✅ **External Field Infrastructure**: H_ext = h × O_ext implemented
@@ -276,7 +276,7 @@ Gap: 10¹⁸ orders of magnitude
 We have built a **production-ready framework** for systematic LQG macroscopic coherence exploration:
 - ✅ Robust numerical infrastructure
 - ✅ All 6 core directions implemented
-- ✅ Enhanced with GPT-5 recommendations
+- ✅ Enhanced with researcher recommendations
 - ✅ Comprehensive documentation
 - ✅ Validated with multiple demos
 

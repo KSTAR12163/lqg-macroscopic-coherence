@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-GPT-5 Priority A: Quick λ Extension Test
+researcher Priority A: Quick λ Extension Test
 
 Test if λ > 10⁻² breaks perturbative regime.
 If any values remain perturbative (ratio < 0.1), we get another 10-100× easily.
@@ -28,7 +28,7 @@ MatterGeometryCoupling = matter_coupling_module.MatterGeometryCoupling
 print("=" * 80)
 print("CRITICAL TEST: λ EXTENSION BEYOND 10⁻²")
 print("=" * 80)
-print("\nGPT-5 Question: Can we push λ higher and still stay perturbative?")
+print("\nresearcher Question: Can we push λ higher and still stay perturbative?")
 print("Criterion: |H_int| / |H_geom| << 0.1")
 print("\nIf YES → Another 10-100× for free")
 print("If NO → 10⁻² is the hard limit\n")
@@ -178,7 +178,7 @@ if valid_lambdas and max(r['lambda'] for r in valid_lambdas) > 1e-2:
     print("4. Check if this closes gap meaningfully (unlikely but check)")
 else:
     print("\n1. ✓ Confirm λ=10⁻² is hard limit")
-    print("2. → Move to GPT-5 Path 1: Theory investigation")
+    print("2. → Move to researcher Path 1: Theory investigation")
     print("3.    a) N-scaling analysis (does f_eff ∝ N² exist?)")
     print("4.    b) Critical point search (diverging susceptibility?)")
     print("5.    c) Topological protection calculation")
