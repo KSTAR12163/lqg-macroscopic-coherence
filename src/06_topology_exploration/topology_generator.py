@@ -84,26 +84,42 @@ def octahedral_edges() -> List[Tuple[int, int]]:
 def icosahedral_edges() -> List[Tuple[int, int]]:
     """
     Icosahedral graph: 12 nodes, 30 edges.
-    Regular icosahedron connectivity.
+    Regular icosahedron connectivity (coordination number 5).
     
-    Using golden ratio construction.
+    Using golden ratio construction with dynamic edge threshold.
     """
     # Golden ratio
     phi = (1 + np.sqrt(5)) / 2
     
     # 12 vertices: permutations of (0, ±1, ±φ)
     vertices = []
-    for signs in itertools.product([1, -1], repeat=2):
-        vertices.append([0, signs[0], signs[1] * phi])
-        vertices.append([signs[0], signs[1] * phi, 0])
-        vertices.append([signs[0] * phi, 0, signs[1]])
+    
+    # Group 1: (0, ±1, ±φ)
+    for s1, s2 in itertools.product([1, -1], repeat=2):
+        vertices.append([0, s1 * 1, s2 * phi])
+    
+    # Group 2: (±1, ±φ, 0)
+    for s1, s2 in itertools.product([1, -1], repeat=2):
+        vertices.append([s1 * 1, s2 * phi, 0])
+    
+    # Group 3: (±φ, 0, ±1)
+    for s1, s2 in itertools.product([1, -1], repeat=2):
+        vertices.append([s1 * phi, 0, s2 * 1])
     
     vertices = np.array(vertices)
     
-    # Edges: connect vertices at distance ~2.0 (nearest neighbors in icosahedron)
-    edges = []
-    edge_threshold = 2.1  # Adjusted threshold
+    # Edges: connect nearest neighbors
+    # Compute all pairwise distances first
+    distances = []
+    for i in range(12):
+        for j in range(i + 1, 12):
+            dist = np.linalg.norm(vertices[i] - vertices[j])
+            distances.append(dist)
     
+    # Threshold = shortest distance + 1% (dynamically adapt to numerical precision)
+    edge_threshold = np.min(distances) * 1.01
+    
+    edges = []
     for i in range(12):
         for j in range(i + 1, 12):
             dist = np.linalg.norm(vertices[i] - vertices[j])
