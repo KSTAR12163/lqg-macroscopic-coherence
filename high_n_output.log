@@ -1,0 +1,174 @@
+======================================================================
+HIGH-N SCALING EXPLORATION
+======================================================================
+
+Goal: Push Tier 1 to its limits
+Test: N = [100, 238, 500, 1000, 2000]
+Config: Optimized (λ=5, E=10⁻¹³ J, j=2, dim=16)
+
+⚠️  WARNING: N=2000 has ~2 million edges!
+   Computation may take several minutes
+   Hamiltonian size: 16×16 (manageable)
+
+Press Enter to continue...======================================================================
+HIGH-N SCALING EXPLORATION
+======================================================================
+
+Testing N = [100, 238, 500, 1000, 2000]
+Configuration: j=2.0, λ=5.0, E=1.00e-13 J, dim=16
+
+======================================================================
+N = 100
+======================================================================
+Creating network...   Created complete network: 100 nodes, 4950 edges
+✅ 4,950 edges (0.05s)
+Building Hamiltonian... ✅ (0.48s)
+Diagonalizing (dim=16)... ✅ (0.00s)
+
+Results:
+  g = 3.1349e-113 J
+  Enhancement = 7.9165e+07×
+  Gap = 1.0000e-13 J
+  Total time = 0.53s
+
+Vs Targets:
+  Tier 1 (10⁶×): 7.92e+01× ✅
+  Tier 2 (10³⁶×): 7.92e-29× ❌
+  Warp (10⁷¹×): 7.92e-64× ❌
+
+======================================================================
+N = 238
+======================================================================
+Creating network...   Created complete network: 238 nodes, 28203 edges
+✅ 28,203 edges (0.25s)
+Building Hamiltonian... ✅ (2.90s)
+Diagonalizing (dim=16)... ✅ (0.00s)
+
+Results:
+  g = 1.7861e-112 J
+  Enhancement = 4.5105e+08×
+  Gap = 1.0000e-13 J
+  Total time = 3.16s
+
+Vs Targets:
+  Tier 1 (10⁶×): 4.51e+02× ✅
+  Tier 2 (10³⁶×): 4.51e-28× ❌
+  Warp (10⁷¹×): 4.51e-63× ❌
+
+======================================================================
+N = 500
+======================================================================
+Creating network...   Created complete network: 500 nodes, 124750 edges
+✅ 124,750 edges (0.84s)
+Building Hamiltonian... ✅ (11.52s)
+Diagonalizing (dim=16)... ✅ (0.00s)
+
+Results:
+  g = 7.9006e-112 J
+  Enhancement = 1.9951e+09×
+  Gap = 1.0000e-13 J
+  Total time = 12.36s
+
+Vs Targets:
+  Tier 1 (10⁶×): 2.00e+03× ✅
+  Tier 2 (10³⁶×): 2.00e-27× ❌
+  Warp (10⁷¹×): 2.00e-62× ❌
+
+======================================================================
+N = 1000
+======================================================================
+Creating network...   Created complete network: 1000 nodes, 499500 edges
+✅ 499,500 edges (2.34s)
+Building Hamiltonian... ✅ (30.67s)
+Diagonalizing (dim=16)... ✅ (0.00s)
+
+Results:
+  g = 3.1634e-111 J
+  Enhancement = 7.9884e+09×
+  Gap = 1.0000e-13 J
+  Total time = 33.01s
+
+Vs Targets:
+  Tier 1 (10⁶×): 7.99e+03× ✅
+  Tier 2 (10³⁶×): 7.99e-27× ❌
+  Warp (10⁷¹×): 7.99e-62× ❌
+
+======================================================================
+N = 2000
+======================================================================
+Creating network...   Created complete network: 2000 nodes, 1999000 edges
+✅ 1,999,000 edges (7.27s)
+Building Hamiltonian... ✅ (95.18s)
+Diagonalizing (dim=16)... ✅ (0.00s)
+
+Results:
+  g = 1.2660e-110 J
+  Enhancement = 3.1970e+10×
+  Gap = 1.0000e-13 J
+  Total time = 102.45s
+
+Vs Targets:
+  Tier 1 (10⁶×): 3.20e+04× ✅
+  Tier 2 (10³⁶×): 3.20e-26× ❌
+  Warp (10⁷¹×): 3.20e-61× ❌
+
+======================================================================
+SCALING ANALYSIS
+======================================================================
+
+Power Law Fit: g = g₀ × N^α
+  α = 2.0031
+  g₀ = 3.0963e-117 J
+  RMS residual = 0.0013
+
+Comparison to Theory:
+  Theory: α = 2.0
+  Measured: α = 2.0031
+  Deviation: 0.0031 (0.15%)
+  ✅ Excellent agreement!
+
+======================================================================
+EXTRAPOLATION
+======================================================================
+
+Assuming α = 2.0031 holds...
+
+         N     Enhancement      vs 10⁶×     vs 10⁷¹×
+------------------------------------------------------------
+     1,000       7.986e+09     7.99e+03     7.99e-62
+     5,000       2.006e+11     2.01e+05     2.01e-60
+    10,000       8.043e+11     8.04e+05     8.04e-60
+    50,000       2.021e+13     2.02e+07     2.02e-58
+   100,000       8.100e+13     8.10e+07     8.10e-58
+
+======================================================================
+N REQUIREMENTS
+======================================================================
+
+         Target      Required N       Feasible?
+--------------------------------------------------
+         Tier 1        1.13e+01          ✅ Easy
+          10¹⁰×        1.12e+03     ✅ Tractable
+          10¹⁵×        3.51e+05   ❌ Impractical
+          10²⁰×        1.10e+08   ❌ Impractical
+         Tier 2        1.07e+16    ❌ Impossible
+           Warp        3.18e+33    ❌ Impossible
+
+======================================================================
+COMPUTATIONAL SCALING
+======================================================================
+
+Time Scaling: t ∝ N^β
+  β = 1.742
+  ✅ Better than N³ (expected for diagonalization)
+
+Time Projections:
+  N=1,000:   34.2s (0.6min)
+  N=5,000:  564.2s (9.4min)
+  N=10,000: 1887.2s (31.5min)
+
+✅ Plot saved: high_n_scaling.png
+
+======================================================================
+✅ HIGH-N EXPLORATION COMPLETE
+======================================================================
