@@ -1,0 +1,58 @@
+# Warp Bubble Candidate Configurations
+# 
+# Test candidates for evaluation pipeline.
+# Each candidate specifies shape, velocity, and geometric parameters.
+
+candidates:
+  # Classic Alcubierre drive with top-hat profile
+  - name: "Alcubierre Classic (10c)"
+    shape_type: "top_hat"
+    parameters:
+      sigma: 1.0      # Wall steepness parameter
+      R: 100.0        # Bubble radius (m)
+    velocity: 10.0    # Target velocity (units of c)
+    bubble_radius: 100.0
+    wall_thickness: 10.0
+  
+  # Smooth dome profile (potentially lower energy)
+  - name: "Smooth Dome (1c)"
+    shape_type: "smooth_dome"
+    parameters:
+      sigma: 5.0
+      R: 50.0
+      smoothness: 2.0  # Higher = smoother transition
+    velocity: 1.0
+    bubble_radius: 50.0
+    wall_thickness: 5.0
+  
+  # Alpha Centauri mission profile (4.37 ly → need ~4-5c for reasonable travel time)
+  - name: "Alpha Centauri Express (4c)"
+    shape_type: "asymmetric"
+    parameters:
+      sigma_front: 2.0   # Front wall steepness
+      sigma_back: 8.0    # Back wall steepness (asymmetric)
+      R: 75.0
+    velocity: 4.0
+    bubble_radius: 75.0
+    wall_thickness: 15.0
+  
+  # Conservative test: just above lightspeed
+  - name: "Conservative (1.1c)"
+    shape_type: "smooth_dome"
+    parameters:
+      sigma: 10.0   # Very smooth
+      R: 30.0
+      smoothness: 5.0
+    velocity: 1.1
+    bubble_radius: 30.0
+    wall_thickness: 3.0
+  
+  # Aggressive test: 100c
+  - name: "Aggressive (100c)"
+    shape_type: "top_hat"
+    parameters:
+      sigma: 0.5    # Sharp wall
+      R: 200.0
+    velocity: 100.0
+    bubble_radius: 200.0
+    wall_thickness: 20.0

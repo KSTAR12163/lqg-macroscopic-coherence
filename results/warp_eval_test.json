@@ -1,0 +1,206 @@
+{
+  "n_candidates": 3,
+  "n_viable": 0,
+  "results": [
+    {
+      "candidate": {
+        "name": "Alcubierre Classic",
+        "shape_type": "top_hat",
+        "parameters": {
+          "sigma": 1.0,
+          "R": 100.0
+        },
+        "velocity": 10.0,
+        "bubble_radius": 100.0,
+        "wall_thickness": 10.0
+      },
+      "energy_conditions": [
+        {
+          "condition": "QI",
+          "satisfied": true,
+          "violation_magnitude": 0.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "QNEC",
+          "satisfied": true,
+          "violation_magnitude": 0.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "ANEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "NEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "WEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        }
+      ],
+      "stability": {
+        "stable": true,
+        "n_unstable_modes": 0,
+        "characteristic_timescale": null,
+        "notes": "[STUB] Full stability analysis not yet implemented"
+      },
+      "source_realizability": {
+        "realizable": false,
+        "required_energy": 2.0227749475576865e+52,
+        "required_negative_energy": 2.0227749475576865e+51,
+        "required_power": 6.414177281702456e+44,
+        "materials": [
+          "Exotic matter (unknown)",
+          "HTS coils"
+        ],
+        "TRL": 1,
+        "notes": "[STUB] Crude estimate: E_neg=2.02e+51 J"
+      },
+      "overall_score": 46.0,
+      "viable": false,
+      "recommendation": "REJECT: Fundamental issues with energy/stability/realizability"
+    },
+    {
+      "candidate": {
+        "name": "Smooth Dome",
+        "shape_type": "smooth_dome",
+        "parameters": {
+          "sigma": 5.0,
+          "R": 50.0,
+          "smoothness": 2.0
+        },
+        "velocity": 1.0,
+        "bubble_radius": 50.0,
+        "wall_thickness": 5.0
+      },
+      "energy_conditions": [
+        {
+          "condition": "QI",
+          "satisfied": true,
+          "violation_magnitude": 0.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "QNEC",
+          "satisfied": true,
+          "violation_magnitude": 0.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "ANEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "NEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "WEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        }
+      ],
+      "stability": {
+        "stable": true,
+        "n_unstable_modes": 0,
+        "characteristic_timescale": null,
+        "notes": "[STUB] Full stability analysis not yet implemented"
+      },
+      "source_realizability": {
+        "realizable": false,
+        "required_energy": 2.528468684447108e+49,
+        "required_negative_energy": 2.528468684447108e+48,
+        "required_power": 8.017721602128069e+41,
+        "materials": [
+          "Exotic matter (unknown)",
+          "HTS coils"
+        ],
+        "TRL": 1,
+        "notes": "[STUB] Crude estimate: E_neg=2.53e+48 J"
+      },
+      "overall_score": 46.0,
+      "viable": false,
+      "recommendation": "REJECT: Fundamental issues with energy/stability/realizability"
+    },
+    {
+      "candidate": {
+        "name": "Asymmetric Lens",
+        "shape_type": "asymmetric",
+        "parameters": {
+          "sigma_front": 2.0,
+          "sigma_back": 8.0,
+          "R": 75.0
+        },
+        "velocity": 4.0,
+        "bubble_radius": 75.0,
+        "wall_thickness": 15.0
+      },
+      "energy_conditions": [
+        {
+          "condition": "QI",
+          "satisfied": true,
+          "violation_magnitude": 0.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "QNEC",
+          "satisfied": true,
+          "violation_magnitude": 0.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "ANEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "NEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        },
+        {
+          "condition": "WEC",
+          "satisfied": false,
+          "violation_magnitude": 10000000000.0,
+          "notes": "[STUB] Not yet implemented"
+        }
+      ],
+      "stability": {
+        "stable": true,
+        "n_unstable_modes": 0,
+        "characteristic_timescale": null,
+        "notes": "[STUB] Full stability analysis not yet implemented"
+      },
+      "source_realizability": {
+        "realizable": false,
+        "required_energy": 1.3653730896014384e+51,
+        "required_negative_energy": 1.3653730896014385e+50,
+        "required_power": 4.329569665149158e+43,
+        "materials": [
+          "Exotic matter (unknown)",
+          "HTS coils"
+        ],
+        "TRL": 1,
+        "notes": "[STUB] Crude estimate: E_neg=1.37e+50 J"
+      },
+      "overall_score": 46.0,
+      "viable": false,
+      "recommendation": "REJECT: Fundamental issues with energy/stability/realizability"
+    }
+  ]
+}
