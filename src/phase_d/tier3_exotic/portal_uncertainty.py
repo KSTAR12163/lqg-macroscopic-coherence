@@ -2,8 +2,10 @@
 """
 Portal Coupling Uncertainty Quantification
 
-Monte Carlo sampling over field parameters and portal couplings
-to generate confidence intervals for g_eff.
+Monte Carlo uncertainty over field parameters and portal couplings
+to generate confidence intervals for g_eff. Uses Latin Hypercube
+Sampling (LHS) per-parameter to ensure stratified coverage across
+orders of magnitude without external dependencies.
 
 Usage:
     python -m src.phase_d.tier3_exotic.portal_uncertainty \
@@ -14,7 +16,7 @@ Usage:
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 import numpy as np
 
 from src.phase_d.tier3_exotic.portal_physics import (
@@ -22,6 +24,23 @@ from src.phase_d.tier3_exotic.portal_physics import (
     enforce_axion_constraints,
     E_PLANCK
 )
+
+
+def _lhs_1d(n_samples: int, low: float, high: float, *, log_uniform: bool = False, rng: Optional[np.random.Generator] = None) -> np.ndarray:
+    """
+    Latin Hypercube sample for one dimension.
+    - If log_uniform: stratify in log10 space, then exponentiate.
+    """
+    rng = rng or np.random.default_rng()
+    # Create bins [i/n, (i+1)/n)
+    bins = (np.arange(n_samples) + rng.random(n_samples)) / n_samples
+    rng.shuffle(bins)
+    if log_uniform:
+        lo, hi = np.log10(low), np.log10(high)
+        samples = 10 ** (lo + bins * (hi - lo))
+    else:
+        samples = low + bins * (high - low)
+    return samples
 
 
 def sample_field_parameters(n_samples: int, seed: int = 42) -> Dict[str, np.ndarray]:
@@ -35,7 +54,7 @@ def sample_field_parameters(n_samples: int, seed: int = 42) -> Dict[str, np.ndar
     Returns:
         Dictionary of parameter arrays
     """
-    np.random.seed(seed)
+    rng = np.random.default_rng(seed)
     
     # Realistic ranges (log-uniform for spanning orders of magnitude)
     B_range = (0.1, 20.0)  # Tesla (0.1 T to 20 T superconducting)
@@ -43,17 +62,22 @@ def sample_field_parameters(n_samples: int, seed: int = 42) -> Dict[str, np.ndar
     V_range = (1e-3, 10.0)  # m³ (1 liter to 10 m³)
     photon_E_range = (0.5, 3.0)  # eV (visible to near-UV)
     
-    # Log-uniform sampling
-    B_samples = 10 ** np.random.uniform(np.log10(B_range[0]), np.log10(B_range[1]), n_samples)
-    E_samples = 10 ** np.random.uniform(np.log10(E_range[0]), np.log10(E_range[1]), n_samples)
-    V_samples = 10 ** np.random.uniform(np.log10(V_range[0]), np.log10(V_range[1]), n_samples)
-    photon_E_samples = np.random.uniform(photon_E_range[0], photon_E_range[1], n_samples)
+    # Include nucleon density uncertainty (solid to dense solid)
+    nN_range = (1e28, 3e29)  # m^-3
+
+    # Latin Hypercube sampling
+    B_samples = _lhs_1d(n_samples, B_range[0], B_range[1], log_uniform=True, rng=rng)
+    E_samples = _lhs_1d(n_samples, E_range[0], E_range[1], log_uniform=True, rng=rng)
+    V_samples = _lhs_1d(n_samples, V_range[0], V_range[1], log_uniform=True, rng=rng)
+    photon_E_samples = _lhs_1d(n_samples, photon_E_range[0], photon_E_range[1], log_uniform=False, rng=rng)
+    nN_samples = _lhs_1d(n_samples, nN_range[0], nN_range[1], log_uniform=True, rng=rng)
     
     return {
         'B_field': B_samples,
         'E_field': E_samples,
         'volume': V_samples,
-        'photon_energy': photon_E_samples
+        'photon_energy': photon_E_samples,
+        'nucleon_density': nN_samples
     }
 
 
@@ -73,7 +97,7 @@ def sample_portal_parameters(
     Returns:
         Dictionary of coupling parameter arrays
     """
-    np.random.seed(seed + 1)  # Different seed than field params
+    rng = np.random.default_rng(seed + 1)  # Different seed than field params
     
     if bounds == 'conservative':
         g_agamma_range = (1e-16, 6e-11)  # Just below CAST
@@ -86,16 +110,10 @@ def sample_portal_parameters(
     else:
         raise ValueError(f"Unknown bounds: {bounds}")
     
-    # Log-uniform sampling
-    g_agamma_samples = 10 ** np.random.uniform(
-        np.log10(g_agamma_range[0]), np.log10(g_agamma_range[1]), n_samples
-    )
-    m_axion_samples = 10 ** np.random.uniform(
-        np.log10(m_axion_range[0]), np.log10(m_axion_range[1]), n_samples
-    )
-    g_aN_samples = 10 ** np.random.uniform(
-        np.log10(g_aN_range[0]), np.log10(g_aN_range[1]), n_samples
-    )
+    # Latin Hypercube, log-uniform
+    g_agamma_samples = _lhs_1d(n_samples, g_agamma_range[0], g_agamma_range[1], log_uniform=True, rng=rng)
+    m_axion_samples   = _lhs_1d(n_samples, m_axion_range[0],   m_axion_range[1],   log_uniform=True, rng=rng)
+    g_aN_samples      = _lhs_1d(n_samples, g_aN_range[0],      g_aN_range[1],      log_uniform=True, rng=rng)
     
     return {
         'g_agamma': g_agamma_samples,
@@ -144,6 +162,7 @@ def run_uncertainty_quantification(
     g_eff_samples = []
     kappa_eff_samples = []
     excluded_count = 0
+    exclusion_reasons: Dict[str, int] = {}
     
     for i in range(n_samples):
         g_eff, diag = compute_axion_effective_coupling_refined(
@@ -154,11 +173,14 @@ def run_uncertainty_quantification(
             E_field=field_params['E_field'][i],
             photon_energy=field_params['photon_energy'][i],
             volume=field_params['volume'][i],
+            nucleon_density=field_params['nucleon_density'][i],
             model=model
         )
         
         if diag.get('excluded', False):
             excluded_count += 1
+            reason = diag.get('reason', 'unknown')
+            exclusion_reasons[reason] = exclusion_reasons.get(reason, 0) + 1
             continue
         
         g_eff_samples.append(g_eff)
@@ -172,6 +194,10 @@ def run_uncertainty_quantification(
     print(f"  Total samples: {n_samples}")
     print(f"  Excluded: {excluded_count} ({100*excluded_count/n_samples:.1f}%)")
     print(f"  Valid: {len(g_eff_samples)} ({100*len(g_eff_samples)/n_samples:.1f}%)")
+    if excluded_count > 0:
+        print("  Reasons:")
+        for r, cnt in sorted(exclusion_reasons.items(), key=lambda x: -x[1]):
+            print(f"    - {r}: {cnt}")
     
     if len(g_eff_samples) == 0:
         print("\n❌ NO VALID SAMPLES - all excluded by constraints")
@@ -244,7 +270,8 @@ def run_uncertainty_quantification(
         'statistics': {
             'n_valid': len(g_eff_samples),
             'n_excluded': excluded_count,
-            'exclusion_fraction': excluded_count / n_samples
+            'exclusion_fraction': excluded_count / n_samples,
+            'exclusion_reasons': exclusion_reasons
         },
         'g_eff_J': {
             'median': float(g_eff_percentiles[2]),

@@ -1,0 +1,52 @@
+{
+  "configuration": {
+    "n_samples": 20,
+    "bounds": "conservative",
+    "model": "conservative",
+    "seed": 123
+  },
+  "statistics": {
+    "n_valid": 20,
+    "n_excluded": 0,
+    "exclusion_fraction": 0.0,
+    "exclusion_reasons": {}
+  },
+  "g_eff_J": {
+    "median": 1.965425478468674e-31,
+    "mean": 6.185595685331431e-27,
+    "std": 1.949571114424486e-26,
+    "min": 9.777485437603385e-38,
+    "max": 8.70713059669107e-26,
+    "percentile_2.5": 1.576605811884881e-35,
+    "percentile_16": 2.3051105615277427e-33,
+    "percentile_50": 1.965425478468674e-31,
+    "percentile_84": 3.4988976837312654e-27,
+    "percentile_97.5": 5.876539691339672e-26,
+    "CI_68": [
+      2.3051105615277427e-33,
+      3.4988976837312654e-27
+    ],
+    "CI_95": [
+      1.576605811884881e-35,
+      5.876539691339672e-26
+    ]
+  },
+  "kappa_eff": {
+    "median": 1.0047768161599837e-40,
+    "CI_68": [
+      1.178432698813471e-42,
+      1.788727842008117e-36
+    ],
+    "CI_95": [
+      8.060020516469894e-45,
+      3.0042405096440084e-35
+    ]
+  },
+  "threshold_analysis": {
+    "threshold_J": 1e-50,
+    "fraction_above": 1.0,
+    "median_vs_threshold": 1.965425478468674e+19,
+    "CI_95_lower_vs_threshold": 1576605811884881.0
+  },
+  "dynamic_range_orders": 11.949647880618551
+}
