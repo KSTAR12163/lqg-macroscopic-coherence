@@ -1,31 +1,102 @@
 # Documentation Index: Phase B-C-D
 
-**Last Updated**: October 13, 2025  
-**Status**: Phase B-C Complete (Corrected), Phase D Planning
+**Last Updated**: October 14, 2025  
+**Status**: Phase B-C Complete (Corrected), Phase D Day 1 Complete, Week 1 In Progress
 
 ---
 
-## Current Status Documents (START HERE)
+## 🎯 IMMEDIATE ACTION (START HERE)
 
-### 1. **EXECUTIVE_SUMMARY_OCT13.md** ⭐ **READ THIS FIRST**
-**Purpose**: Complete project overview from Phase 1 through Phase D planning  
+### **Week 1 Quick-Start** [`../WEEK1_QUICKSTART.md`](../WEEK1_QUICKSTART.md) ⭐ **DO THIS NOW**
+**Purpose**: Day-by-day execution guide for Week 1 (Oct 14-20, 2025)  
 **Key Content**:
-- Chronological timeline of what happened
-- What we learned (valid physics vs. numerical artifacts)
-- Quantitative assessment (gap analysis)
-- Phase D roadmap overview
-- Scientific value assessment
+- Copy-paste commands to run analytical bounds
+- Expected outputs and interpretations
+- Implementation tasks (network construction, measurements)
+- Decision criteria for Week 1 completion
 
-**When to read**: Getting up to speed, explaining to others, grant proposals
+**When to use**: Starting work TODAY, executing Tier 1 Week 1
 
 ---
 
-### 2. **QUICK_REFERENCE_ARTIFACT.md** ⭐ **QUICK SUMMARY**
+## 📊 Phase D Implementation Documents (CURRENT)
+
+### 1. **PHASE_D_EXECUTIVE_SUMMARY.md** [`../PHASE_D_EXECUTIVE_SUMMARY.md`](../PHASE_D_EXECUTIVE_SUMMARY.md) ⭐ **READ FIRST**
+**Purpose**: Complete Phase D overview and strategy  
+**Key Content**:
+- The problem: g₀ too weak by ~10⁷¹×
+- The solution: Three-tier time-boxed search
+- Success criteria (g₀ ≥ 10⁻⁵⁰ J for viability)
+- Possible outcomes: SUCCESS / PARTIAL / FUNDAMENTAL LIMIT
+- Timeline: 6 months to definitive answer
+
+**When to read**: Understanding Phase D, explaining to others, grant proposals
+
+### 2. **PHASE_D_PLAN.md** [`../PHASE_D_PLAN.md`](../PHASE_D_PLAN.md) 🗺️ **COMPREHENSIVE**
+**Purpose**: Complete 6-month roadmap with week-by-week tasks  
+**Key Content**:
+- Three tiers: Collective (10⁶×), EFT (10³⁰×), Exotic (10⁷¹×)
+- Hard go/no-go gates at 4, 12, 24 weeks
+- Acceptance criteria and stop rules
+- Resource requirements and deliverables schedule
+
+**When to read**: Research planning, task assignment, resource allocation
+
+### 3. **PHASE_D_STATUS.md** [`../PHASE_D_STATUS.md`](../PHASE_D_STATUS.md) 📋 **IMPLEMENTATION**
+**Purpose**: Day 1 completion status and next steps  
+**Key Content**:
+- Day 1 completion checklist (✅ DONE)
+- Week 1 action items (⏳ IN PROGRESS)
+- Success metrics and risk management
+- Computational requirements
+
+**When to read**: Tracking progress, checking what's done, planning next steps
+
+---
+
+## 🛡️ Protection & Validation (MANDATORY)
+
+### 4. **Numerical Guardrails** [`../src/numerical_guardrails.py`](../src/numerical_guardrails.py) 🔒 **CRITICAL**
+**Purpose**: Prevent floating-point artifacts like Phase B incident  
+**Key Content**:
+- `validate_coupling()`: Check g_eff > 10⁻⁵⁰ J
+- `validate_hamiltonian()`: Detect diagonal matrices
+- `check_growth_rate_independence()`: Flag parameter artifacts
+- Unit tests: 6/6 passing
+
+**When to use**: BEFORE EVERY COMPUTATION in Phase D (mandatory!)
+
+### 5. **Acceptance Tests** [`../src/phase_d/acceptance_tests.py`](../src/phase_d/acceptance_tests.py) ✅ **GATES**
+**Purpose**: Hard go/no-go criteria for each tier  
+**Key Content**:
+- `tier1_acceptance_test()`: Enhancement ≥ 10⁶×?
+- `tier2_acceptance_test()`: g₀ ≥ 10⁻⁶⁰ J with natural coefficients?
+- `tier3_acceptance_test()`: g₀ ≥ 10⁻⁵⁰ J + defensible + testable?
+- `phase_d_final_assessment()`: Overall SUCCESS / PARTIAL / LIMIT
+
+**When to use**: At decision gates (Week 4, 12, 24)
+
+---
+
+## 📚 Phase B-C Analysis Documents (BACKGROUND)
+
+### 6. **EXECUTIVE_SUMMARY_OCT13.md** 📖 **COMPLETE HISTORY**
+**Purpose**: Complete project overview from Phase 1 through Phase C  
+**Key Content**:
+- Chronological timeline of what happened (Oct 12-13)
+- What we learned (valid physics vs. numerical artifacts)
+- Quantitative assessment (gap analysis: 10⁷¹×)
+- Initial Phase D planning overview
+
+**When to read**: Getting up to speed, historical context, explaining project evolution
+
+---
+
+### 7. **QUICK_REFERENCE_ARTIFACT.md** ⚡ **FAST SUMMARY**
 **Purpose**: Fast reference for the numerical artifact issue  
 **Key Content**:
-- Simple explanation of what went wrong
-- The numbers (g₀, F_p, gaps)
-- Evidence of the artifact
+- Simple explanation of what went wrong (g₀ ≈ 10⁻¹²¹ J below float precision)
+- The numbers and evidence
 - What remains valid vs. invalid
 - 1-page summary for discussions
 
@@ -33,56 +104,54 @@
 
 ---
 
-### 3. **PHASE_B_CORRECTED_ANALYSIS.md** 📊 **DETAILED TECHNICAL**
+### 8. **PHASE_B_CORRECTED_ANALYSIS.md** 🔬 **TECHNICAL DEPTH**
 **Purpose**: Comprehensive technical analysis of the numerical artifact  
 **Key Content**:
 - Detailed explanation of floating-point precision issue
-- Complete evidence (multi-tone results, Purcell independence)
+- Complete evidence (multi-tone results, Purcell independence, diagonal Hamiltonian)
 - What we actually learned (positive + negative)
-- Quantitative gap analysis
+- Quantitative gap analysis (need 10⁷¹× enhancement)
 - Implications for warp research
 
 **When to read**: Technical deep dive, writing papers, defending conclusions
 
 ---
 
-### 4. **PHASE_D_THEORETICAL_ROADMAP.md** 🗺️ **PATH FORWARD**
-**Purpose**: 6-month systematic search for enhanced coupling  
+### 9. **PHASE_D_THEORETICAL_ROADMAP.md** (HISTORICAL - See PHASE_D_PLAN.md instead)
+**Purpose**: Initial 6-month search concept (superseded by PHASE_D_PLAN.md)  
 **Key Content**:
-- Three-tier research strategy
-- Specific mechanisms to explore (collective, higher-order, alternatives)
-- Timeline and decision criteria
-- Success/failure thresholds
-- Alternative research directions if Phase D fails
+- Three-tier research strategy (concept phase)
+- Specific mechanisms to explore
+- Initial timeline and decision criteria
 
-**When to read**: Planning next steps, allocating resources, research proposals
+**When to read**: Historical context only - use PHASE_D_PLAN.md for current roadmap
 
 ---
 
-## Phase B Original Documents (CORRECTED WITH WARNINGS)
+## 🗂️ Phase B Original Documents (CORRECTED WITH WARNINGS)
 
-### 5. **PHASE_B_BREAKTHROUGH.md** ⚠️ **ARTIFACT WARNING ADDED**
+### 10. **PHASE_B_BREAKTHROUGH.md** ⚠️ **ARTIFACT WARNING ADDED**
 **Purpose**: Original "breakthrough" document (now marked as artifact)  
 **Status**: Preserved for reference with prominent warning at top  
 **Key Content**:
-- Original Steps 1-3 results (2 years, pumped Lindblad, etc.)
-- Physics that IS valid (gain mechanism)
-- Implementation that was INVALID (coupling too weak)
+- Original Steps 1-3 results (2 years, pumped Lindblad, etc.) - ARTIFACT
+- Physics that IS valid (gain mechanism, mathematical framework)
+- Implementation that was INVALID (coupling too weak by 70 orders)
 
 **When to read**: Understanding how the artifact occurred, learning from mistakes
 
 ---
 
-### 6. **PHASE_B_ACTION_PLAN.md** ⚠️ **SUPERSEDED**
+### 11. **PHASE_B_ACTION_PLAN.md** ⚠️ **SUPERSEDED**
 **Purpose**: Original immediate next steps (now outdated)  
-**Status**: Superseded by PHASE_D_THEORETICAL_ROADMAP.md  
+**Status**: Superseded by WEEK1_QUICKSTART.md and PHASE_D_PLAN.md  
 **Note**: Don't follow this - it was based on the artifact results
 
 ---
 
-## Historical Phase Documents (Context)
+## 📖 Historical Phase Documents (Context)
 
-### 7. **PHASE_1_FINAL_ANALYSIS.md**
+### 12. **PHASE_1_FINAL_ANALYSIS.md**
 **Phase**: Parameter optimization (Oct 12-13)  
 **Key Results**:
 - 60M× enhancement achieved
@@ -90,205 +159,154 @@
 - Topology independence confirmed
 - N-scaling saturated (α ≈ 0)
 
-### 8. **PHASE_A_NULL_RESULT.md**
+### 13. **PHASE_A_NULL_RESULT.md**
 **Phase**: Non-equilibrium mechanisms (Oct 13 AM)  
 **Key Results**:
 - Parametric driving: 0× enhancement
 - Dissipative engineering: No enhancement
 - **Critical conclusion**: Passive (Hermitian) mechanisms CANNOT amplify
 
-### 9. **BREAKTHROUGH_LAMBDA_1_PERTURBATIVE.md**
+### 14. **BREAKTHROUGH_LAMBDA_1_PERTURBATIVE.md**
 **Discovery**: λ can be pushed to 1.0 (not just 0.01)  
 **Impact**: 10,000× gain from λ optimization alone
 
-### 10. **GPT5_RESPONSE_OCT13.md**
-**Purpose**: Response to external GPT-5 analysis of Phase 1  
-**Key Content**: Defense of methodology, null result value, decision framework
-
-### 11. **STRATEGIC_DECISION_POINT.md**
-**Purpose**: Where do we go after Phase A nulls?  
-**Decision**: Pursue active gain mechanism (led to Phase B)
+### 15. **GPT5_RESPONSE_OCT13.md** + **STRATEGIC_DECISION_POINT.md**
+**Purpose**: Response to external analysis + decision framework  
+**Key Content**: Defense of methodology, null result value, path forward
 
 ---
 
-## Supporting Technical Documents
+## 🛠️ Supporting Technical Documents
 
-### 12. **theoretical_foundation.md**
-**Purpose**: Core physics and mathematical framework  
-**Key Content**: LQG basics, polymer quantization, coupling derivation
-
-### 13. **research_roadmap.md**
-**Purpose**: Original 5-direction research plan  
-**Status**: Evolved significantly through phases
-
-### 14. **researcher_IMPLEMENTATION.md**
-**Purpose**: Implementation details for Phase 1  
-**Key Content**: Code structure, optimization strategies
-
-### 15. **researcher_ENHANCEMENTS.md** + **PART2.md**
-**Purpose**: Enhancement strategies and techniques  
-**Key Content**: GPU acceleration, algorithmic improvements
-
-### 16. **researcher_RESPONSE_OCT13.md**
-**Purpose**: Initial response to GPT-5 suggestions  
-**Key Content**: Why certain paths weren't pursued
+### 16-20. **theoretical_foundation.md**, **research_roadmap.md**, **researcher_*.md**
+**Purpose**: Core physics, implementation details, enhancement strategies  
+**When to read**: Deep technical work, understanding LQG coupling derivation
 
 ---
 
-## Session Summaries
+## 📅 Session Summaries
 
-### 17. **SESSION_OCT12_2025_FINAL.md**
-**Session**: Phase 1 completion  
-**Key Events**: λ = 1.0 discovery, optimization completion, null results
-
-### 18. **SESSION_SUMMARY_OCT12_2025.md**
-**Session**: Transition to Phase A  
-**Key Events**: Decision to test non-equilibrium mechanisms
+### 21-22. **SESSION_OCT12_2025*.md**
+**Purpose**: Session-by-session progress logs  
+**Key Events**: Phase transitions, discoveries, decision points
 
 ---
 
-## How to Use This Documentation
+## 🚀 How to Use This Documentation
 
-### For Understanding Current Status
+### **For Immediate Execution** (TODAY)
 ```
-1. Read: EXECUTIVE_SUMMARY_OCT13.md (overview)
-2. Read: QUICK_REFERENCE_ARTIFACT.md (fast reference)
-3. Optional: PHASE_B_CORRECTED_ANALYSIS.md (technical depth)
+1. Read: WEEK1_QUICKSTART.md (day-by-day guide) ← START HERE
+2. Run: python src/phase_d/tier1_collective/n_scaling.py
+3. Implement: Network construction (Days 2-3)
+4. Measure: Initial scaling (Days 4-5)
+5. Report: Week 1 decision (Days 6-7)
 ```
 
-### For Planning Next Steps
+### **For Understanding Phase D**
 ```
-1. Read: PHASE_D_THEORETICAL_ROADMAP.md (6-month plan)
+1. Read: PHASE_D_EXECUTIVE_SUMMARY.md (overview)
+2. Read: PHASE_D_PLAN.md (comprehensive 6-month plan)
+3. Read: PHASE_D_STATUS.md (Day 1 completion, Week 1 tasks)
+```
+
+### **For Understanding the Artifact**
+```
+1. Read: QUICK_REFERENCE_ARTIFACT.md (fast summary)
+2. Read: PHASE_B_CORRECTED_ANALYSIS.md (technical depth)
+3. Show: g₀ = 10⁻¹²¹ J < ε = 10⁻¹⁶ (the smoking gun)
+```
+
+### **For Planning Research**
+```
+1. Read: PHASE_D_PLAN.md (6-month roadmap)
 2. Review: PHASE_1_FINAL_ANALYSIS.md (what worked)
 3. Review: PHASE_A_NULL_RESULT.md (what didn't work)
-```
-
-### For Writing Papers
-```
-1. Read: PHASE_B_CORRECTED_ANALYSIS.md (complete analysis)
-2. Read: All Phase documents (comprehensive story)
-3. Extract: Key results, null results, methodology
-```
-
-### For Explaining the Artifact
-```
-1. Read: QUICK_REFERENCE_ARTIFACT.md (simple explanation)
-2. Show: The numbers (g₀ = 10⁻¹²¹ J vs. precision ε = 10⁻¹⁶)
-3. Evidence: Multi-tone results all identical (smoking gun)
-```
-
-### For Learning From Mistakes
-```
-1. Read: PHASE_B_BREAKTHROUGH.md (original claims)
-2. Compare: PHASE_B_CORRECTED_ANALYSIS.md (what was wrong)
-3. Extract: Lessons learned section (scientific process)
+4. Use: Guardrails + acceptance tests (mandatory validation)
 ```
 
 ---
 
-## Document Status Summary
+## 📊 Document Status Summary
 
 | Document | Status | Action |
 |----------|--------|--------|
-| EXECUTIVE_SUMMARY_OCT13.md | ✅ Current | Use for overview |
-| QUICK_REFERENCE_ARTIFACT.md | ✅ Current | Use for quick ref |
-| PHASE_B_CORRECTED_ANALYSIS.md | ✅ Current | Use for technical |
-| PHASE_D_THEORETICAL_ROADMAP.md | ✅ Current | Use for planning |
-| PHASE_B_BREAKTHROUGH.md | ⚠️ Corrected | Warning added, preserved |
-| PHASE_B_ACTION_PLAN.md | ⚠️ Superseded | Don't follow |
-| PHASE_1_FINAL_ANALYSIS.md | ✅ Valid | Historical context |
-| PHASE_A_NULL_RESULT.md | ✅ Valid | Historical context |
-| Other historical docs | ✅ Valid | Reference as needed |
+| **WEEK1_QUICKSTART.md** | ✅ **CURRENT** | **USE FOR EXECUTION** |
+| **PHASE_D_EXECUTIVE_SUMMARY.md** | ✅ **CURRENT** | Use for overview |
+| **PHASE_D_PLAN.md** | ✅ **CURRENT** | Use for planning |
+| **PHASE_D_STATUS.md** | ✅ **CURRENT** | Use for tracking |
+| **numerical_guardrails.py** | ✅ **MANDATORY** | Use in ALL scripts |
+| **acceptance_tests.py** | ✅ **MANDATORY** | Use at gates |
+| EXECUTIVE_SUMMARY_OCT13.md | ✅ Valid | Historical context |
+| QUICK_REFERENCE_ARTIFACT.md | ✅ Valid | Artifact summary |
+| PHASE_B_CORRECTED_ANALYSIS.md | ✅ Valid | Technical analysis |
+| PHASE_D_THEORETICAL_ROADMAP.md | ⚠️ Historical | Use PHASE_D_PLAN.md |
+| PHASE_B_BREAKTHROUGH.md | ⚠️ Corrected | Warning added |
+| PHASE_B_ACTION_PLAN.md | ⚠️ Superseded | Use WEEK1_QUICKSTART.md |
 
 ---
 
-## Key Files by Purpose
-
-### Understanding the Project
-- Start: `EXECUTIVE_SUMMARY_OCT13.md`
-- Quick: `QUICK_REFERENCE_ARTIFACT.md`
-- Deep: `PHASE_B_CORRECTED_ANALYSIS.md`
-
-### Doing Research
-- Planning: `PHASE_D_THEORETICAL_ROADMAP.md`
-- Theory: `theoretical_foundation.md`
-- Implementation: `researcher_IMPLEMENTATION.md`
-
-### Writing Papers
-- Complete story: All Phase documents in order
-- Null results: `PHASE_A_NULL_RESULT.md`
-- Artifact analysis: `PHASE_B_CORRECTED_ANALYSIS.md`
-- Methodology: `PHASE_1_FINAL_ANALYSIS.md`
-
-### Grant Applications
-- Overview: `EXECUTIVE_SUMMARY_OCT13.md`
-- Impact: Phase D potential discoveries
-- Track record: Phase 1 accomplishments
-- Rigor: Artifact identification and correction
-
----
-
-## Timeline Overview
-
-```
-Oct 12-13 (AM):  Phase 1 - Parameter optimization → 60M×, nulls
-Oct 13 (AM):     Phase A - Non-equilibrium tests → All nulls
-Oct 13 (PM):     Phase B - Active gain "breakthrough" → 2 years (artifact!)
-Oct 13 (Eve):    Phase B-C Corrected - Artifact identified → Need g₀ ~ 10⁻⁵⁰ J
-Oct 13 (Night):  Phase D Planning - 6-month theoretical search roadmap
-Next 6 months:   Phase D Execution - Search for enhanced coupling
-```
-
----
-
-## Critical Numbers to Remember
+## 🎯 Critical Numbers to Remember
 
 | Parameter | Value | Meaning |
 |-----------|-------|---------|
-| Current g₀ | 10⁻¹²¹ J | Too weak |
-| Required g₀ | 10⁻⁵⁰ J | For viability |
-| Gap | 10⁷¹× | Fundamental physics problem |
+| **Current g₀** | **10⁻¹²¹ J** | Too weak |
+| **Required g₀** | **10⁻⁵⁰ J** | For viability |
+| **Gap** | **10⁷¹×** | Fundamental physics problem |
 | Float precision | ε ≈ 10⁻¹⁶ | Why artifact occurred |
-| Required F_p | 10¹⁴¹ | Impossible |
+| Artifact F_p | 10¹⁴¹ | Impossible |
 | Realistic F_p | 10⁶ - 10¹² | Current technology |
 
 ---
 
-## Questions and Answers
+## ❓ Quick Q&A
 
-**Q**: Where do I start?  
-**A**: `EXECUTIVE_SUMMARY_OCT13.md` - complete overview
+**Q**: Where do I start TODAY?  
+**A**: `WEEK1_QUICKSTART.md` - Execute Day 1 analytical bounds
 
-**Q**: What's the quick version?  
-**A**: `QUICK_REFERENCE_ARTIFACT.md` - 5-minute read
+**Q**: What's the big picture?  
+**A**: `PHASE_D_EXECUTIVE_SUMMARY.md` - Complete overview
 
-**Q**: Was Phase B a complete failure?  
-**A**: No! Valid physics (gain works), invalid implementation (coupling too weak)
+**Q**: What's the detailed plan?  
+**A**: `PHASE_D_PLAN.md` - 6-month week-by-week roadmap
+
+**Q**: What was the artifact?  
+**A**: `QUICK_REFERENCE_ARTIFACT.md` - Fast summary (5 min)
 
 **Q**: Can we still build a warp drive?  
-**A**: Not with current LQG coupling. Need Phase D to find g₀ ~ 10⁻⁵⁰ J
+**A**: **Not with current LQG coupling. Phase D will answer definitively in 6 months.**
 
-**Q**: What's next?  
-**A**: Phase D - 6-month systematic search (see `PHASE_D_THEORETICAL_ROADMAP.md`)
-
-**Q**: Is this work valuable even if warp fails?  
-**A**: Yes! Framework, methodology, benchmarks, null results all valuable
+**Q**: When do we know?  
+**A**: **June 14, 2026** (24-week final gate)
 
 ---
 
-## For New Team Members
+## 📌 For New Team Members
 
-**Day 1**: Read `EXECUTIVE_SUMMARY_OCT13.md` + `QUICK_REFERENCE_ARTIFACT.md`
+**Day 1**: 
+- Read `PHASE_D_EXECUTIVE_SUMMARY.md` (the problem + solution)
+- Read `QUICK_REFERENCE_ARTIFACT.md` (what went wrong)
+- Start `WEEK1_QUICKSTART.md` (begin execution)
 
-**Week 1**: Read all Phase documents (1, A, B-corrected, D)
+**Week 1**: 
+- Read all Phase documents (1, A, B-corrected)
+- Review `PHASE_D_PLAN.md` (full 6-month plan)
+- Execute Week 1 tasks
 
-**Month 1**: Deep dive into `theoretical_foundation.md` and implementation docs
+**Month 1**: 
+- Deep dive into `theoretical_foundation.md`
+- Complete Tier 1 (collective enhancement)
+- 4-week gate decision
 
-**Ongoing**: Refer to this index for specific topics as needed
+**Ongoing**: 
+- Refer to this index for specific topics
+- Use guardrails in EVERY script (mandatory!)
+- Report at Week 4, 12, 24
 
 ---
 
 **This documentation represents rigorous, honest science with both successes and failures documented transparently.** 🎯
 
-**Last Updated**: October 13, 2025  
-**Next Update**: After Phase D.1 completion (Week 4)
+**Status**: Phase D Day 1 ✅ Complete | Week 1 ⏳ In Progress | Final Answer: June 14, 2026
+
+**Last Updated**: October 14, 2025
