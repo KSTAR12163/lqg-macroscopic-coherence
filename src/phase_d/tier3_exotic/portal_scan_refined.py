@@ -85,6 +85,12 @@ def main():
         help='Interaction volume (m³)'
     )
     parser.add_argument(
+        '--model',
+        choices=['conservative', 'optimistic'],
+        default='conservative',
+        help='Coupling scaling model'
+    )
+    parser.add_argument(
         '--out',
         type=Path,
         default=Path('results/portal_g0_bounds_refined.json'),
@@ -100,6 +106,7 @@ def main():
     print(f"  Magnetic field: {args.B_field:.2e} T")
     print(f"  Electric field: {args.E_field:.2e} V/m")
     print(f"  Volume: {args.volume:.2e} m³")
+    print(f"  Model: {args.model}")
     print(f"  Grid resolution: {args.n_points}³ = {args.n_points**3} points")
     
     # Run refined scan
@@ -109,7 +116,8 @@ def main():
         n_points=args.n_points,
         B_field=args.B_field,
         E_field=args.E_field,
-        volume=args.volume
+        volume=args.volume,
+        model=args.model
     )
     
     print(f"  Total configurations: {args.n_points**3}")

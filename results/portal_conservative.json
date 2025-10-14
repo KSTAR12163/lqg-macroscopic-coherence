@@ -1,0 +1,171 @@
+{
+  "scan_parameters": {
+    "bounds": "conservative",
+    "n_points_per_dim": 5,
+    "total_grid_points": 125,
+    "B_field_T": 1.0,
+    "E_field_V_m": 1000000.0,
+    "volume_m3": 1.0
+  },
+  "constraints": {
+    "total_configs": 125,
+    "passed_constraints": 125,
+    "exclusion_rate": 0.0
+  },
+  "best_configuration": {
+    "g_agamma": 6.000000000000003e-11,
+    "g_aN": 1e-10,
+    "m_axion": 1e-06,
+    "g_eff": 1.4674577960971848e-21,
+    "kappa_eff": 7.502027364377512e-31,
+    "vs_GeV": 9.15915115072877e-12,
+    "lambda_axion_m": 1.973269803383964e-10,
+    "field_energy_density": 397891.7848236468,
+    "excluded": 0.0
+  },
+  "comparison_to_baselines": {
+    "vs_lqg_baseline": 1.4674577960971848e+100,
+    "vs_old_portal_claim": 235546997768408.47,
+    "vs_threshold": 1.4674577960971849e+29,
+    "exceeds_threshold": true,
+    "baseline_lqg_J": 1e-121,
+    "old_portal_J": 6.23e-36,
+    "threshold_J": 1e-50
+  },
+  "physical_validation": {
+    "g_eff_J": 1.4674577960971848e-21,
+    "kappa_eff": 7.502027364377512e-31,
+    "below_planck_energy": true,
+    "above_quantum_gravity": true,
+    "physically_reasonable": true,
+    "context": "Best axion config"
+  },
+  "dimensionless_metrics": {
+    "kappa_eff": 7.502027364377512e-31,
+    "vs_planck_energy": 7.502027364377512e-31,
+    "vs_electron_mass": 1.792397485465513e-08,
+    "vs_proton_mass": 9.764553465595706e-12,
+    "vs_GeV": 9.15915115072877e-12,
+    "vs_eV": 0.00915915115072877
+  },
+  "top_10_configs": [
+    {
+      "g_agamma": 6.000000000000003e-11,
+      "g_aN": 1e-10,
+      "m_axion": 1e-06,
+      "g_eff": 1.4674577960971848e-21,
+      "kappa_eff": 7.502027364377512e-31,
+      "vs_GeV": 9.15915115072877e-12,
+      "lambda_axion_m": 1.973269803383964e-10,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 6.000000000000003e-11,
+      "g_aN": 5.6234132519034904e-12,
+      "m_axion": 1e-06,
+      "g_eff": 8.252121617181998e-23,
+      "kappa_eff": 4.218700009698311e-32,
+      "vs_GeV": 5.150569195719526e-13,
+      "lambda_axion_m": 1.973269803383964e-10,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 2.155824671778506e-12,
+      "g_aN": 1e-10,
+      "m_axion": 1e-06,
+      "g_eff": 5.2726362027000374e-23,
+      "kappa_eff": 2.695509280080419e-32,
+      "vs_GeV": 3.290920670548262e-13,
+      "lambda_axion_m": 1.973269803383964e-10,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 6.000000000000003e-11,
+      "g_aN": 1e-10,
+      "m_axion": 5.623413251903491e-06,
+      "g_eff": 4.6405090058380526e-23,
+      "kappa_eff": 2.3723493540342873e-32,
+      "vs_GeV": 2.8963779070055097e-13,
+      "lambda_axion_m": 3.509025061809257e-11,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 6.000000000000003e-11,
+      "g_aN": 3.162277660168379e-13,
+      "m_axion": 1e-06,
+      "g_eff": 4.640509005838053e-24,
+      "kappa_eff": 2.3723493540342878e-33,
+      "vs_GeV": 2.89637790700551e-14,
+      "lambda_axion_m": 1.973269803383964e-10,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 2.155824671778506e-12,
+      "g_aN": 5.6234132519034904e-12,
+      "m_axion": 1e-06,
+      "g_eff": 2.965021229472949e-24,
+      "kappa_eff": 1.5157962606233068e-33,
+      "vs_GeV": 1.850620690972422e-14,
+      "lambda_axion_m": 1.973269803383964e-10,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 6.000000000000003e-11,
+      "g_aN": 5.6234132519034904e-12,
+      "m_axion": 5.623413251903491e-06,
+      "g_eff": 2.6095499839007197e-24,
+      "kappa_eff": 1.3340700795621097e-33,
+      "vs_GeV": 1.6287529904775277e-14,
+      "lambda_axion_m": 3.509025061809257e-11,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 7.745966692414836e-14,
+      "g_aN": 1e-10,
+      "m_axion": 1e-06,
+      "g_eff": 1.8944798685155448e-24,
+      "kappa_eff": 9.685075681675472e-34,
+      "vs_GeV": 1.1824413290723005e-14,
+      "lambda_axion_m": 1.973269803383964e-10,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 2.155824671778506e-12,
+      "g_aN": 1e-10,
+      "m_axion": 5.623413251903491e-06,
+      "g_eff": 1.667353967399336e-24,
+      "kappa_eff": 8.52394877917486e-34,
+      "vs_GeV": 1.040680491786111e-14,
+      "lambda_axion_m": 3.509025061809257e-11,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    },
+    {
+      "g_agamma": 6.000000000000003e-11,
+      "g_aN": 1e-10,
+      "m_axion": 3.1622776601683795e-05,
+      "g_eff": 1.4674577960971848e-24,
+      "kappa_eff": 7.502027364377512e-34,
+      "vs_GeV": 9.15915115072877e-15,
+      "lambda_axion_m": 6.24002701672596e-12,
+      "field_energy_density": 397891.7848236468,
+      "excluded": 0.0
+    }
+  ],
+  "statistics": {
+    "g_eff_min": 2.445762993495308e-38,
+    "g_eff_max": 1.4674577960971848e-21,
+    "g_eff_median": 5.990871365845436e-30,
+    "kappa_eff_min": 1.2503378940629187e-47,
+    "kappa_eff_max": 7.502027364377512e-31,
+    "kappa_eff_median": 3.0626898465202385e-39
+  }
+}

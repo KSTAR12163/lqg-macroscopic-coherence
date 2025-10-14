@@ -90,6 +90,8 @@ def compute_axion_effective_coupling_refined(
     E_field: float = 1e6,  # V/m (background electric field)
     photon_energy: float = 1.0,  # eV (characteristic photon energy)
     volume: float = 1.0,  # m³ (interaction volume)
+    nucleon_density: float = 8e28,  # m⁻³ (solid matter density)
+    model: str = 'conservative',  # 'conservative' or 'optimistic'
 ) -> Tuple[float, Dict]:
     """
     Compute effective matter-geometry coupling from axion portal.
@@ -99,8 +101,9 @@ def compute_axion_effective_coupling_refined(
     - Couples to nucleons via L_int = (g_aN/f_a) a N̄N
     - Induces second-order effective interaction: matter ↔ geometry via axion exchange
     
-    Effective coupling estimate:
-    g_eff ∼ (g_aγ × g_aN)² × (EB/m_a²)² × ħ/V
+    Two models:
+    - Conservative: g_eff ∼ (g_aγ × g_aN) × (u_field × V) × λ_a² × n_N × ħ (linear in energy)
+    - Optimistic: g_eff ∼ (g_aγ × g_aN)² × (u_field × V)² / m_a² × ħ (quadratic)
     
     This is a proxy for the energy scale of the effective interaction.
     
@@ -112,6 +115,8 @@ def compute_axion_effective_coupling_refined(
         E_field: Background electric field (V/m)
         photon_energy: Characteristic photon energy (eV)
         volume: Interaction volume (m³)
+        nucleon_density: Nucleon number density (m⁻³)
+        model: 'conservative' or 'optimistic' scaling
         
     Returns:
         (g_eff_J, diagnostics)
@@ -122,7 +127,8 @@ def compute_axion_effective_coupling_refined(
         return 0.0, {
             'excluded': True,
             'reason': reason,
-            'g_eff_J': 0.0
+            'g_eff_J': 0.0,
+            'model': model
         }
     
     # Convert to SI
@@ -146,16 +152,27 @@ def compute_axion_effective_coupling_refined(
     photon_energy_J = photon_energy * 1.602176634e-19  # eV to J
     n_photon = u_field / photon_energy_J  # m⁻³
     
-    # Second-order effective interaction energy scale
-    # g_eff ∼ (g_aγ × g_aN)² × (field energy)² / m_a² × (interaction volume)
-    # Dimensional analysis: [GeV⁻²] × [J²] / [J²] × [m³] × [ħ] → [J]
+    # Two models for effective interaction energy scale
     
     coupling_product = abs(g_agamma_SI * g_aN)  # J⁻¹
     mass_suppression = 1.0 / (m_axion_kg * C**2)**2  # J⁻²
     
-    # Effective coupling as energy scale of induced interaction
-    # This is a rough order-of-magnitude estimate
-    g_eff = (coupling_product**2) * (u_field * volume)**2 * mass_suppression * HBAR
+    if model == 'conservative':
+        # Linear scaling: g_eff ∼ (g_aγ × g_aN) × (u_field × V) × λ_a² × n_N × ħ
+        # Dimensional: [J⁻¹] × [J] × [m²] × [m⁻³] × [J·s] → [J·m⁻¹·s] 
+        # Need to normalize: multiply by c to get [J]
+        g_eff_conservative = coupling_product * (u_field * volume) * (lambda_axion**2) * nucleon_density * HBAR * C
+        g_eff = g_eff_conservative
+        
+    elif model == 'optimistic':
+        # Quadratic scaling: g_eff ∼ (g_aγ × g_aN)² × (u_field × V)² / m_a² × ħ
+        # Dimensional: [J⁻²] × [J²] × [J⁻²] × [J·s] → [J⁻¹·s]
+        # Need volume normalization: this was the original squared model
+        g_eff_optimistic = (coupling_product**2) * (u_field * volume)**2 * mass_suppression * HBAR
+        g_eff = g_eff_optimistic
+        
+    else:
+        raise ValueError(f"Unknown model: {model}. Use 'conservative' or 'optimistic'")
     
     # Dimensionless coupling (normalized to Planck energy)
     kappa_eff = g_eff / E_PLANCK
@@ -170,7 +187,9 @@ def compute_axion_effective_coupling_refined(
         'E_field_V_m': E_field,
         'field_energy_density_J_m3': u_field,
         'photon_density_m3': n_photon,
+        'nucleon_density_m3': nucleon_density,
         'volume_m3': volume,
+        'model': model,
         'g_eff_J': g_eff,
         'kappa_eff_dimensionless': kappa_eff,
         'vs_planck_energy': g_eff / E_PLANCK,
@@ -206,7 +225,9 @@ def scan_axion_parameter_space_refined(
     n_points: int = 10,
     B_field: float = 1.0,
     E_field: float = 1e6,
-    volume: float = 1.0
+    volume: float = 1.0,
+    nucleon_density: float = 8e28,
+    model: str = 'conservative'
 ) -> list:
     """
     Scan axion parameter space with refined physics and constraints.
@@ -217,6 +238,8 @@ def scan_axion_parameter_space_refined(
         B_field: Background magnetic field (T)
         E_field: Background electric field (V/m)
         volume: Interaction volume (m³)
+        nucleon_density: Nucleon number density (m⁻³)
+        model: 'conservative' or 'optimistic' coupling scaling
         
     Returns:
         List of valid configurations sorted by g_eff
@@ -261,7 +284,9 @@ def scan_axion_parameter_space_refined(
                     g_aγ, g_N, m_a,
                     B_field=B_field,
                     E_field=E_field,
-                    volume=volume
+                    volume=volume,
+                    nucleon_density=nucleon_density,
+                    model=model
                 )
                 
                 if diag.get('excluded', False):

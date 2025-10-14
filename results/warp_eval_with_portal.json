@@ -1,0 +1,55 @@
+{
+  "configuration": {
+    "candidate_file": "configs/warp_candidates.yaml",
+    "portal_g_eff_J": 1.47e-21,
+    "n_candidates": 5
+  },
+  "summary": {
+    "total": 5,
+    "viable": 0,
+    "not_viable": 5,
+    "week_12_gate_passed": false
+  },
+  "results": [
+    {
+      "candidate": {
+        "name": "Alcubierre Classic (10c)",
+        "shape": "unknown",
+        "velocity": 10.0,
+        "radius": 100.0,
+        "wall_thickness": 10.0
+      },
+      "portal": {
+        "g_eff_J": 1.47e-21,
+        "boost_factor": 10000000000.0
+      },
+      "energy_conditions": {
+        "NEC": {
+          "condition": "NEC",
+          "formula": "\u03c1 + p \u2265 0",
+          "rho": -1.0,
+          "p": 1.0,
+          "rho_plus_p": 0.0,
+          "passed": true,
+          "violation_magnitude": 0.0,
+          "location": "bubble_wall"
+        },
+        "WEC": {
+          "condition": "WEC",
+          "formula": "\u03c1 \u2265 0 AND \u03c1 + p \u2265 0",
+          "rho": -1.0,
+          "p": 1.0,
+          "rho_positive": false,
+          "rho_plus_p": 0.0,
+          "rho_plus_p_positive": true,
+          "passed": false,
+          "violations": [
+            "\u03c1 = -1.0000e+00 < 0"
+          ],
+          "location": "bubble_wall"
+        },
+        "ANEC": {
+          "condition": "ANEC",
+          "formula": "\u222b T_\u03bc\u03bd k^\u03bc k^\u03bd d\u03bb \u2265 0",
+          "integral": -2.5066268060051677,
+          "passed": 
