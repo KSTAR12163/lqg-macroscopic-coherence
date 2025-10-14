@@ -23,8 +23,8 @@ from dataclasses import dataclass
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from src.spin_network import SpinNetwork
-from src.matter_geometry_coupling import MatterGeometryCoupling
+from src.core.spin_network import SpinNetwork
+from src.core.constants import HBAR, C, L_PLANCK
 from src.numerical_guardrails import validate_coupling, G_EFF_THRESHOLD
 from src.phase_d.acceptance_tests import tier1_acceptance_test, tier1_scaling_analysis
 
