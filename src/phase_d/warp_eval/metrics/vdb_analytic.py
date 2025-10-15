@@ -193,10 +193,13 @@ def vdb_inverse_metric(
     g_tx = -vf Ω²
     g_xx = g_yy = g_zz = Ω²
     
-    Inverse (block diagonal in (t,x) and (y,z)):
-    g^tt = -1/Ω²
-    g^tx = -vf/Ω²
-    g^xx = 1/Ω² - v²f²
+    The (t,x) 2×2 block determinant is:
+    det = (-1 + v²f²Ω²)Ω² - (vfΩ²)² = -Ω²
+    
+    Inverse (from 2×2 block inversion):
+    g^tt = -1
+    g^tx = -vf
+    g^xx = (1 - v²f²Ω²)/Ω²
     g^yy = g^zz = 1/Ω²
     
     Args:
@@ -212,16 +215,19 @@ def vdb_inverse_metric(
     f, _ = vdb_shape_function(r_s, R, sigma)
     Omega, _ = vdb_conformal_factor(r_s, R, sigma, Omega_max)
     
-    # Compute inverse
+    # Compute inverse from block inversion formula
     g_inv = np.zeros((4, 4))
     
     v_eff = v_s * f
-    Omega2_inv = 1.0 / Omega**2
+    Omega2 = Omega**2
+    Omega2_inv = 1.0 / Omega2
     
-    g_inv[0, 0] = -Omega2_inv
-    g_inv[0, 1] = g_inv[1, 0] = -v_eff * Omega2_inv
+    # (t,x) block from 2×2 inversion
+    g_inv[0, 0] = -1.0
+    g_inv[0, 1] = g_inv[1, 0] = -v_eff
+    g_inv[1, 1] = (1.0 - v_eff**2 * Omega2) * Omega2_inv
     
-    g_inv[1, 1] = Omega2_inv - v_eff**2
+    # (y,z) diagonal (independent)
     g_inv[2, 2] = Omega2_inv
     g_inv[3, 3] = Omega2_inv
     
@@ -438,7 +444,8 @@ if __name__ == "__main__":
     
     # Compare to numerical
     import sys
-    sys.path.insert(0, '../../..')
+    import os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
     from phase_d.warp_eval.stress_energy import (
         compute_metric_derivatives,
         compute_christoffel_symbols

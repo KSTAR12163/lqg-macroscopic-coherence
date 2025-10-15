@@ -74,12 +74,31 @@ def main():
         return
     
     # Step 3: Test QI checker
-    qi_test = "python -c \"import sys; sys.path.insert(0,'../../..'); from phase_d.energy_conditions.qi import QuantumInequalityChecker; print('QI module imported successfully')\""
+    print("\n" + "="*70)
+    print("Step 3/5: Testing Quantum Inequality Module")
+    print("="*70)
     
-    if not run_command(
-        qi_test,
-        "Step 3/5: Testing Quantum Inequality Module"
-    ):
+    import sys
+    import os
+    # Add phase_d parent directory to path
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    phase_d_dir = os.path.dirname(script_dir)  # Go up from warp_eval to phase_d
+    src_dir = os.path.dirname(phase_d_dir)     # Go up from phase_d to src
+    if src_dir not in sys.path:
+        sys.path.insert(0, src_dir)
+    
+    try:
+        from phase_d.energy_conditions.qi import QuantumInequalityChecker
+        checker = QuantumInequalityChecker('lorentzian', tau_0=1e-6)
+        print(f"✅ QI module loaded successfully")
+        print(f"   QI bound (τ₀=1µs): ρ_min = {checker.rho_min_bound:.3e} J/m³")
+        print(f"   Compare: Alcubierre needs ρ ~ -1e40 J/m³")
+        print(f"   Gap: {abs(checker.rho_min_bound / 1e40):.1e}× too weak\n")
+        print(f"✅ Step 3/5: Testing Quantum Inequality Module completed successfully")
+    except Exception as e:
+        print(f"❌ Step 3/5 failed: {e}")
+        import traceback
+        traceback.print_exc()
         return
     
     # Step 4: Multi-metric ANEC comparison

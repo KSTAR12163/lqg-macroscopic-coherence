@@ -388,7 +388,8 @@ if __name__ == "__main__":
     
     # Compare to numerical Christoffel
     import sys
-    sys.path.insert(0, '../../..')
+    import os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
     from phase_d.warp_eval.stress_energy import (
         compute_metric_derivatives,
         compute_christoffel_symbols

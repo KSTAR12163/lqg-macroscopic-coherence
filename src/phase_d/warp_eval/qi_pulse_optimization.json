@@ -1,0 +1,19 @@
+{
+  "metric": "Alcubierre",
+  "params": {
+    "v_s": 1.0,
+    "R": 100.0,
+    "sigma": 10.0
+  },
+  "pulse_search": {
+    "types_tested": [
+      "gaussian",
+      "lorentzian",
+      "tanh"
+    ],
+    "candidates": [
+      {
+        "pulse_type": "gaussian",
+        "t_center": 6.671281903963041e-07,
+        "t_width": 1.3342563807926082e-07,
+        "satisfies_qi": 
