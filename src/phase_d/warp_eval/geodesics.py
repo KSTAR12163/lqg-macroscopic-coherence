@@ -140,45 +140,106 @@ def null_tangent(
     return k
 
 
+def project_to_null_cone(
+    k: np.ndarray,
+    g: np.ndarray,
+    u: np.ndarray = None
+) -> np.ndarray:
+    """
+    Project 4-vector k onto null cone: k ← k - (1/2)(g(k,k)/g(k,u)) u.
+    
+    This ensures g_μν k^μ k^ν = 0 to numerical precision.
+    
+    Args:
+        k: 4-vector to project
+        g: Metric tensor g_μν
+        u: Timelike reference 4-vector (default: [1, 0, 0, 0])
+        
+    Returns:
+        Projected k satisfying g(k, k) ≈ 0
+    """
+    if u is None:
+        u = np.array([1.0, 0.0, 0.0, 0.0])
+    
+    # Compute g(k, k) and g(k, u)
+    g_kk = np.dot(k, np.dot(g, k))
+    g_ku = np.dot(k, np.dot(g, u))
+    
+    # Avoid division by zero
+    if abs(g_ku) < 1e-10:
+        # Fallback: rescale k^t to satisfy nullness
+        # g_00 (k^t)^2 + 2 g_0i k^t k^i + g_ij k^i k^j = 0
+        # Solve for k^t
+        a = g[0, 0]
+        b = 2 * np.dot(g[0, 1:], k[1:])
+        c = np.dot(k[1:], np.dot(g[1:, 1:], k[1:]))
+        
+        if abs(a) > 1e-10:
+            discriminant = b**2 - 4*a*c
+            if discriminant >= 0:
+                k_t_new = (-b + np.sqrt(discriminant)) / (2*a)
+                k_proj = k.copy()
+                k_proj[0] = k_t_new
+                return k_proj
+        
+        # If all else fails, return unchanged
+        return k
+    
+    # Project: k ← k - (1/2) (g(k,k) / g(k,u)) u
+    k_proj = k - 0.5 * (g_kk / g_ku) * u
+    
+    return k_proj
+
+
 def geodesic_equation_rhs(
     lambda_param: float,
     state: np.ndarray,
     metric_fn: Callable,
-    dx: float = 1e-5
+    dx: float = 1e-5,
+    project_null: bool = True
 ) -> np.ndarray:
     """
-    RHS of geodesic equation for ODE integration.
+    Right-hand side of geodesic equation as first-order system.
     
-    d²x^μ/dλ² = -Γ^μ_αβ dx^α/dλ dx^β/dλ
-    
-    Rewritten as first-order system:
-    dx^μ/dλ = k^μ
-    dk^μ/dλ = -Γ^μ_αβ k^α k^β
-    
+    System:
+        dx^μ/dλ = k^μ
+        dk^μ/dλ = -Γ^μ_αβ k^α k^β
+        
+    With optional null constraint projection at each step.
+        
     Args:
-        lambda_param: Affine parameter (not used in autonomous system)
+        lambda_param: Affine parameter
         state: [x^μ, k^μ] (8-vector)
         metric_fn: Metric function(t, x, y, z) → g_μν
-        dx: Finite difference step for Christoffel computation
+        dx: Step for Christoffel computation
+        project_null: Whether to project k onto null cone each step
         
     Returns:
-        d(state)/dλ = [k^μ, -Γ^μ_αβ k^α k^β]
+        d(state)/dλ (8-vector)
     """
-    coords = state[0:4]  # x^μ = (t, x, y, z)
-    k = state[4:8]       # k^μ = dx^μ/dλ
+    # Extract position and tangent
+    coords = state[0:4]
+    k = state[4:8]
+    
+    # Project k onto null cone if requested
+    if project_null:
+        g = metric_fn(*coords)
+        k = project_to_null_cone(k, g)
     
     # Compute Christoffel symbols at current position
     Gamma = compute_christoffel_at_point(metric_fn, coords, dx)
     
-    # Geodesic equation: dk^μ/dλ = -Γ^μ_αβ k^α k^β
-    dk_dlambda = np.zeros(4)
+    # dx^μ/dλ = k^μ
+    dcoords = k
+    
+    # dk^μ/dλ = -Γ^μ_αβ k^α k^β
+    dk = np.zeros(4)
     for mu in range(4):
         for alpha in range(4):
             for beta in range(4):
-                dk_dlambda[mu] -= Gamma[mu, alpha, beta] * k[alpha] * k[beta]
+                dk[mu] -= Gamma[mu, alpha, beta] * k[alpha] * k[beta]
     
-    # Return [dx/dλ, dk/dλ]
-    return np.concatenate([k, dk_dlambda])
+    return np.concatenate([dcoords, dk])
 
 
 def compute_null_vector(
@@ -197,10 +258,13 @@ def integrate_null_geodesic(
     lambda_max: float,
     n_steps: int = 1000,
     dx_christoffel: float = 1e-5,
-    method: str = 'RK45'
+    method: str = 'RK45',
+    project_null: bool = True,
+    rtol: float = 1e-8,
+    atol: float = 1e-10
 ) -> Tuple[np.ndarray, np.ndarray, Dict]:
     """
-    Integrate null geodesic using adaptive RK45 or fixed RK4.
+    Integrate null geodesic using adaptive RK45 with null constraint projection.
     
     Args:
         metric_fn: Metric function(t, x, y, z) → g_μν
@@ -210,6 +274,9 @@ def integrate_null_geodesic(
         n_steps: Number of output points
         dx_christoffel: Step for Christoffel symbol computation
         method: Integration method ('RK45' or 'RK4')
+        project_null: Whether to project k onto null cone each step
+        rtol: Relative tolerance for integration
+        atol: Absolute tolerance for integration
         
     Returns:
         (positions, tangents, diagnostics)
@@ -222,7 +289,7 @@ def integrate_null_geodesic(
     
     # Define RHS for scipy
     def rhs(lam, state):
-        return geodesic_equation_rhs(lam, state, metric_fn, dx_christoffel)
+        return geodesic_equation_rhs(lam, state, metric_fn, dx_christoffel, project_null)
     
     # Integrate using scipy.integrate.solve_ivp
     lambda_eval = np.linspace(0, lambda_max, n_steps)
@@ -234,8 +301,8 @@ def integrate_null_geodesic(
         method=method,
         t_eval=lambda_eval,
         dense_output=False,
-        rtol=1e-6,
-        atol=1e-9
+        rtol=rtol,
+        atol=atol
     )
     
     if not sol.success:
