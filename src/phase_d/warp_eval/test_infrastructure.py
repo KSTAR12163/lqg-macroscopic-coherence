@@ -18,17 +18,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from phase_d.warp_eval.stress_energy import (
-    alcubierre_metric,
-    stress_energy_from_metric
+    load_alcubierre_metric,
+    compute_stress_energy_from_metric
 )
 from phase_d.warp_eval.portal_stress_energy import (
     compute_portal_delta_T,
-    coherence_suppression,
-    screening_factor
+    estimate_screening_factor
 )
 from phase_d.warp_eval.geodesics import (
-    null_tangent,
-    compute_anec_along_geodesic
+    compute_anec
 )
 
 # Physical constants
@@ -48,19 +46,20 @@ def test_alcubierre_stress_energy():
     R = 100.0      # 100 m radius
     sigma = 10.0   # 10 m wall thickness
     
-    # Test points
+    # Load metric function
+    metric_fn = load_alcubierre_metric(velocity=v_s, radius=R, wall_thickness=sigma)
+
+    # Test points: (t, x, y, z, label)
     positions = [
-        (0, 0, 0, 0, "Bubble center"),
-        (R, 0, 0, 0, "Wall (on axis)"),
-        (2*R, 0, 0, 0, "Outside bubble"),
+        (0.0,   0.0, 0.0, 0.0, "Bubble center"),
+        (0.0, R+0.0, 0.0, 0.0, "Wall (on axis)"),
+        (0.0, 2*R,   0.0, 0.0, "Outside bubble"),
     ]
     
-    for x, y, z, t, label in positions:
+    for t, x, y, z, label in positions:
         try:
-            T = stress_energy_from_metric(
-                alcubierre_metric, x, y, z, t,
-                v_s=v_s, R=R, sigma=sigma
-            )
+            coords = np.array([t, x, y, z], dtype=float)
+            T = compute_stress_energy_from_metric(metric_fn, coords)
             
             T_00 = T[0, 0]  # Energy density
             T_trace = np.trace(T)
@@ -96,16 +95,27 @@ def test_portal_stress_energy():
     }
     
     # Field parameters (realistic lab)
-    field_params = {
-        'B_field': np.array([0, 0, 1.0]),     # 1 T
-        'E_field': np.array([1e6, 0, 0]),     # 1 MV/m
-        'n_nucleon': 8e28,                     # m⁻³ (solid)
-        'volume': 1.0,                         # 1 m³
-        'coherence_time': 1e-6                 # 1 μs
-    }
+    # Field parameters (as scalars, matching API)
+    B_vec = np.array([0, 0, 1.0])   # 1 T
+    E_vec = np.array([1e6, 0, 0])   # 1 MV/m
+    B_mag = float(np.linalg.norm(B_vec))
+    E_mag = float(np.linalg.norm(E_vec))
+    n_nucleon = 8e28
+    volume = 1.0
+    coherence_time = 1e-6
     
     try:
-        delta_T = compute_portal_delta_T(portal_params, field_params)
+        delta_T = compute_portal_delta_T(
+            g_agamma=portal_params['g_agamma'],
+            g_aN=portal_params['g_aN'],
+            m_axion=portal_params['m_axion'],
+            B_field=B_mag,
+            E_field=E_mag,
+            nucleon_density=n_nucleon,
+            volume=volume,
+            coherence_time=coherence_time,
+            coherence_length=1e-6
+        )
         
         delta_T_00 = delta_T[0, 0]  # Energy density contribution
         delta_T_trace = np.trace(delta_T)
@@ -116,10 +126,10 @@ def test_portal_stress_energy():
         print(f"  m_a = {portal_params['m_axion']:.2e} GeV")
         
         print(f"\nField parameters:")
-        print(f"  B = {np.linalg.norm(field_params['B_field']):.1f} T")
-        print(f"  E = {np.linalg.norm(field_params['E_field']):.2e} V/m")
-        print(f"  n_N = {field_params['n_nucleon']:.2e} m⁻³")
-        print(f"  V = {field_params['volume']:.1f} m³")
+        print(f"  B = {B_mag:.1f} T")
+        print(f"  E = {E_mag:.2e} V/m")
+        print(f"  n_N = {n_nucleon:.2e} m⁻³")
+        print(f"  V = {volume:.1f} m³")
         
         print(f"\nPortal contribution:")
         print(f"  δT_00 = {delta_T_00:.3e} J/m³")
@@ -131,14 +141,9 @@ def test_portal_stress_energy():
         print(f"  δT_00 / ρ_Planck = {delta_T_00 / rho_planck:.3e}")
         
         # Coherence suppression
-        lambda_a = hbar * c / (portal_params['m_axion'] * GeV_to_J)
-        coherence = coherence_suppression(
-            field_params['volume'],
-            field_params['coherence_time'],
-            lambda_a
-        )
+        screening = estimate_screening_factor(nucleon_density=n_nucleon)
         print(f"\nMedium effects:")
-        print(f"  Coherence suppression: {coherence:.3e}")
+        print(f"  Screening factor (insulator default): {screening:.3f}")
         
         if abs(delta_T_00) > 0:
             print(f"  ✅ Non-zero portal contribution")
@@ -162,8 +167,9 @@ def test_geodesic_anec():
     # Simple toy stress-energy: diagonal with T_00 = -ρ₀ exp(-r²/R²)
     R_gauss = 10.0  # Gaussian width
     rho_0 = -1e20   # Negative energy density (J/m³)
-    
-    def toy_stress_energy(x, y, z, t):
+
+    # T_fn signature: (t, x, y, z)
+    def toy_stress_energy(t, x, y, z):
         r = np.sqrt(x**2 + y**2 + z**2)
         rho = rho_0 * np.exp(-r**2 / R_gauss**2)
         
@@ -172,27 +178,25 @@ def test_geodesic_anec():
         return T
     
     # Simple flat metric for testing
-    def flat_metric(x, y, z, t):
-        return np.diag([-1, 1, 1, 1])
+    def flat_metric(t, x, y, z):
+        return np.diag([-1.0, 1.0, 1.0, 1.0])
     
     # Null geodesic: radial infall along x-axis
     n_steps = 100
     lambda_max = 20.0  # Pass through Gaussian
     
-    # Sample positions along x-axis
-    positions = np.zeros((n_steps, 4))
-    positions[:, 1] = np.linspace(-lambda_max, lambda_max, n_steps)  # x
-    
-    # Null tangent: k = (1, 1, 0, 0) (radial)
-    tangents = np.zeros((n_steps, 4))
-    tangents[:, 0] = 1.0  # k^t
-    tangents[:, 1] = 1.0  # k^x
+    # Starting point and direction for compute_anec
+    x0 = np.array([0.0, -lambda_max, 0.0, 0.0])  # (t, x, y, z)
+    direction = np.array([1.0, 0.0, 0.0])        # along +x
     
     try:
-        anec_value, diagnostics = compute_anec_along_geodesic(
-            toy_stress_energy,
-            positions,
-            tangents
+        anec_value, diagnostics = compute_anec(
+            metric=flat_metric,
+            T_fn=toy_stress_energy,
+            x0=x0,
+            direction=direction,
+            lambda_max=lambda_max,
+            n_steps=n_steps
         )
         
         print(f"\nToy stress-energy:")
@@ -230,8 +234,9 @@ def test_combined_stress_energy():
     print("="*60)
     
     # Alcubierre at wall
-    x, y, z, t = 100.0, 0, 0, 0
+    x, y, z, t = 100.0, 0.0, 0.0, 0.0
     v_s, R, sigma = 1.0, 100.0, 10.0
+    metric_fn = load_alcubierre_metric(velocity=v_s, radius=R, wall_thickness=sigma)
     
     # Portal parameters
     portal_params = {
@@ -239,23 +244,29 @@ def test_combined_stress_energy():
         'g_aN': 1e-10,
         'm_axion': 1e-6
     }
-    field_params = {
-        'B_field': np.array([0, 0, 10.0]),    # 10 T (strong)
-        'E_field': np.array([1e7, 0, 0]),     # 10 MV/m
-        'n_nucleon': 8e28,
-        'volume': 1.0,
-        'coherence_time': 1e-6
-    }
+    # Field params as scalars (match API)
+    B_mag = 10.0
+    E_mag = 1e7
+    n_nucleon = 8e28
+    volume = 1.0
+    coherence_time = 1e-6
     
     try:
         # Metric stress-energy
-        T_metric = stress_energy_from_metric(
-            alcubierre_metric, x, y, z, t,
-            v_s=v_s, R=R, sigma=sigma
-        )
+        T_metric = compute_stress_energy_from_metric(metric_fn, np.array([t, x, y, z], dtype=float))
         
         # Portal contribution
-        delta_T = compute_portal_delta_T(portal_params, field_params)
+        delta_T = compute_portal_delta_T(
+            g_agamma=portal_params['g_agamma'],
+            g_aN=portal_params['g_aN'],
+            m_axion=portal_params['m_axion'],
+            B_field=B_mag,
+            E_field=E_mag,
+            nucleon_density=n_nucleon,
+            volume=volume,
+            coherence_time=coherence_time,
+            coherence_length=1e-6
+        )
         
         # Combined
         T_total = T_metric + delta_T
