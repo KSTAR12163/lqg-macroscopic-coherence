@@ -10,7 +10,7 @@ Optimized version using analytic Christoffel symbols to:
 import numpy as np
 from typing import Callable, Tuple, Dict
 from scipy.integrate import solve_ivp
-from alcubierre_analytic import (
+from .alcubierre_analytic import (
     alcubierre_metric_analytic,
     alcubierre_christoffel_analytic
 )

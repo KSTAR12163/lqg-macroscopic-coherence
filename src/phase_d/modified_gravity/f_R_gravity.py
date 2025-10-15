@@ -1,20 +1,23 @@
 """
 f(R) Gravity: Modified Field Equations
 
-Implements modified Einstein equations for f(R) gravity theories.
+Implements modified Einstein equations for f(R) = R + α R² gravity.
 
 Standard GR:
     G_μν = 8πG T_μν
 
-f(R) gravity:
+f(R) = R + α R² gravity (explicit form):
+    G_μν + α[2R R_μν - (1/2) R² g_μν - 2(∇_μ∇_ν - g_μν □)R] = 8πG T_μν
+
+Equivalently:
     f'(R) R_μν - (1/2) f(R) g_μν - ∇_μ∇_ν f'(R) + g_μν □ f'(R) = 8πG T_μν
 
-where f(R) is an arbitrary function of the Ricci scalar R.
-
-Simple model: f(R) = R + α R²
-- α: dimensionful parameter [length²]
+For f(R) = R + α R²:
 - f'(R) = 1 + 2αR
 - f''(R) = 2α
+- Modified term: α[2R R_μν - (1/2) R² g_μν - 2(∇_μ∇_ν - g_μν □)R]
+
+Observational constraint: α < 10⁻⁶ m² (PPN tests)
 """
 
 import numpy as np
@@ -214,28 +217,34 @@ class FRGravity:
         # Full implementation requires computing covariant derivatives of f'(R)
         return np.zeros((4, 4))
     
-    def compute_modified_field_equations_LHS(
+    def compute_modified_Einstein_tensor(
         self,
         metric_fn: Callable,
         coords: np.ndarray,
         dx: float = 1e-5
     ) -> np.ndarray:
         """
-        Compute LHS of modified field equations:
+        Compute modified Einstein tensor for f(R) = R + α R² gravity.
         
-        LHS_μν = f'(R) R_μν - (1/2) f(R) g_μν - ∇_μ∇_ν f'(R) + g_μν □ f'(R)
+        Returns G^(f)_μν where:
+            G^(f)_μν = G_μν + α[2R R_μν - (1/2) R² g_μν - 2(∇_μ∇_ν - g_μν □)R]
         
-        Then: LHS_μν = 8πG T_μν
+        This is the LHS of the modified field equations.
         
         Args:
-            metric_fn: Metric function
-            coords: Evaluation point
+            metric_fn: Metric function(t, x, y, z) → g_μν
+            coords: Evaluation point [t, x, y, z]
             dx: Finite difference step
             
         Returns:
-            LHS_μν (4×4 array)
+            G^(f)_μν (4×4 array)
         """
-        from ..warp_eval.stress_energy import (
+        import sys
+        import os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'warp_eval'))
+        
+        from stress_energy import (
+            compute_einstein_tensor,
             compute_ricci_scalar,
             compute_metric_derivatives,
             compute_christoffel_symbols,
@@ -243,12 +252,19 @@ class FRGravity:
             compute_ricci_tensor
         )
         
+        # Standard GR Einstein tensor
+        G_GR = compute_einstein_tensor(metric_fn, coords, dx)
+        
+        # If α = 0, return GR result
+        if abs(self.alpha) < 1e-30:
+            return G_GR
+        
         # Compute geometric quantities
         g = metric_fn(*coords)
         dg = compute_metric_derivatives(metric_fn, coords, dx)
         Gamma = compute_christoffel_symbols(g, dg)
         
-        # Derivatives of Gamma (expensive!)
+        # Derivatives of Gamma
         dGamma = np.zeros((4, 4, 4, 4))
         for mu in range(4):
             coords_p = coords.copy()
@@ -270,24 +286,128 @@ class FRGravity:
         g_inv = np.linalg.inv(g)
         R = compute_ricci_scalar(g_inv, Ric)
         
-        # f(R) and derivatives
-        f = self.f_of_R(R)
-        f_prime_val = self.f_prime(R)
+        # Compute ∇_μ R (gradient of Ricci scalar)
+        grad_R = np.zeros(4)
+        for mu in range(4):
+            coords_p = coords.copy()
+            coords_m = coords.copy()
+            coords_p[mu] += dx
+            coords_m[mu] -= dx
+            
+            R_p = self._compute_R_at_point(metric_fn, coords_p, dx)
+            R_m = self._compute_R_at_point(metric_fn, coords_m, dx)
+            grad_R[mu] = (R_p - R_m) / (2 * dx)
         
-        # Compute □ f'(R) (simplified)
-        box_f_prime = self.compute_box_f_prime(metric_fn, coords, dx)
+        # Compute ∇_μ∇_ν R (Hessian of Ricci scalar)
+        # ∇_μ∇_ν R = ∂_μ∂_ν R - Γ^λ_μν ∂_λ R
+        nabla_nabla_R = np.zeros((4, 4))
         
-        # Compute ∇_μ∇_ν f'(R) (placeholder: zeros for now)
-        nabla_nabla_f_prime = self.compute_nabla_nabla_f_prime(metric_fn, coords, dx)
+        for mu in range(4):
+            for nu in range(4):
+                # Second derivative ∂_μ∂_ν R
+                coords_pp = coords.copy()
+                coords_pm = coords.copy()
+                coords_mp = coords.copy()
+                coords_mm = coords.copy()
+                coords_pp[mu] += dx
+                coords_pp[nu] += dx
+                coords_pm[mu] += dx
+                coords_pm[nu] -= dx
+                coords_mp[mu] -= dx
+                coords_mp[nu] += dx
+                coords_mm[mu] -= dx
+                coords_mm[nu] -= dx
+                
+                R_pp = self._compute_R_at_point(metric_fn, coords_pp, dx)
+                R_pm = self._compute_R_at_point(metric_fn, coords_pm, dx)
+                R_mp = self._compute_R_at_point(metric_fn, coords_mp, dx)
+                R_mm = self._compute_R_at_point(metric_fn, coords_mm, dx)
+                
+                d2R = (R_pp - R_pm - R_mp + R_mm) / (4 * dx * dx)
+                
+                # Christoffel correction
+                christoffel_term = 0.0
+                for lam in range(4):
+                    christoffel_term += Gamma[lam, mu, nu] * grad_R[lam]
+                
+                nabla_nabla_R[mu, nu] = d2R - christoffel_term
         
-        # Assemble LHS
-        LHS = np.zeros((4, 4))
-        LHS = f_prime_val * Ric  # f'(R) R_μν
-        LHS -= 0.5 * f * g  # -(1/2) f(R) g_μν
-        LHS -= nabla_nabla_f_prime  # -∇_μ∇_ν f'(R)
-        LHS += box_f_prime * g  # g_μν □ f'(R)
+        # Compute □ R = g^μν ∇_μ∇_ν R
+        box_R = 0.0
+        for mu in range(4):
+            for nu in range(4):
+                box_R += g_inv[mu, nu] * nabla_nabla_R[mu, nu]
         
-        return LHS
+        # Modified Einstein tensor:
+        # G^(f)_μν = G_μν + α[2R R_μν - (1/2) R² g_μν - 2(∇_μ∇_ν - g_μν □)R]
+        G_modified = G_GR.copy()
+        
+        modification = (
+            2 * R * Ric  # 2R R_μν
+            - 0.5 * R**2 * g  # -(1/2) R² g_μν
+            - 2 * nabla_nabla_R  # -2 ∇_μ∇_ν R
+            + 2 * box_R * g  # +2 g_μν □ R
+        )
+        
+        G_modified += self.alpha * modification
+        
+        return G_modified
+    
+    def _compute_R_at_point(
+        self,
+        metric_fn: Callable,
+        coords: np.ndarray,
+        dx: float
+    ) -> float:
+        """
+        Helper: compute Ricci scalar at a point.
+        
+        Args:
+            metric_fn: Metric function
+            coords: Evaluation point
+            dx: Finite difference step
+            
+        Returns:
+            R (Ricci scalar)
+        """
+        import sys
+        import os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'warp_eval'))
+        
+        from stress_energy import (
+            compute_ricci_scalar,
+            compute_metric_derivatives,
+            compute_christoffel_symbols,
+            compute_riemann_tensor,
+            compute_ricci_tensor
+        )
+        
+        g = metric_fn(*coords)
+        dg = compute_metric_derivatives(metric_fn, coords, dx)
+        Gamma = compute_christoffel_symbols(g, dg)
+        
+        dGamma = np.zeros((4, 4, 4, 4))
+        for mu in range(4):
+            c_p = coords.copy()
+            c_m = coords.copy()
+            c_p[mu] += dx
+            c_m[mu] -= dx
+            
+            g_p = metric_fn(*c_p)
+            g_m = metric_fn(*c_m)
+            dg_p = compute_metric_derivatives(metric_fn, c_p, dx)
+            dg_m = compute_metric_derivatives(metric_fn, c_m, dx)
+            Gamma_p = compute_christoffel_symbols(g_p, dg_p)
+            Gamma_m = compute_christoffel_symbols(g_m, dg_m)
+            
+            dGamma[mu] = (Gamma_p - Gamma_m) / (2 * dx)
+        
+        R_tensor = compute_riemann_tensor(Gamma, dGamma)
+        Ric = compute_ricci_tensor(R_tensor)
+        g_inv = np.linalg.inv(g)
+        R = compute_ricci_scalar(g_inv, Ric)
+        
+        return R
     
     def compute_effective_stress_energy(
         self,
@@ -298,17 +418,17 @@ class FRGravity:
         """
         Compute effective stress-energy from modified field equations:
         
-        T^eff_μν = (1/8πG) LHS_μν
+        T^eff_μν = (c⁴/8πG) G^(f)_μν
         
-        This includes both matter and geometric contributions.
+        This includes both matter and geometric contributions from f(R) modification.
         
         Returns:
             T^eff_μν (4×4 array) in SI units [J/m³]
         """
-        LHS = self.compute_modified_field_equations_LHS(metric_fn, coords, dx)
+        G_modified = self.compute_modified_Einstein_tensor(metric_fn, coords, dx)
         
-        # T^eff_μν = (c⁴/8πG) LHS_μν
-        T_eff = (self.c**4 / (8 * np.pi * self.G_Newton)) * LHS
+        # T^eff_μν = (c⁴/8πG) G^(f)_μν
+        T_eff = (self.c**4 / (8 * np.pi * self.G_Newton)) * G_modified
         
         return T_eff
 

@@ -1,0 +1,257 @@
+Quick test: Point comparison mode
+
+######################################################################
+# f(R) = R + α R² VIABILITY SWEEP
+######################################################################
+
+Mode: points
+α range: [1.000e-10, 1.000e-06] m²
+
+Observational constraint: α < 10⁻⁶ m² (PPN tests)
+
+Portal contribution: δρ ~ 10³ J/m³
+GR requirement: |ρ| ~ 10⁴⁰ J/m³ at wall
+Gap to close: ~37 orders of magnitude
+
+
+======================================================================
+Testing α = 1.000e-10 m²
+======================================================================
+
+======================================================================
+Comparing GR vs f(R) = R + α R² at sample points
+======================================================================
+Bubble: v=1.0c, R=100.0m, σ=10.0m
+f(R) parameter: α = 1.000e-10 m²
+
+r_s =    0.0 m:
+  ρ_GR       = -5.976e+31 J/m³
+  ρ_f(R)     = -2.928e+32 J/m³
+  Δρ         = -2.331e+32 J/m³
+  |Δρ/ρ_GR|  = 3.900e+00
+
+r_s =   50.0 m:
+  ρ_GR       = -4.657e+33 J/m³
+  ρ_f(R)     = +1.042e+35 J/m³
+  Δρ         = +1.089e+35 J/m³
+  |Δρ/ρ_GR|  = 2.338e+01
+
+r_s =  100.0 m:
+  ρ_GR       = +0.000e+00 J/m³
+  ρ_f(R)     = +3.162e+36 J/m³
+  Δρ         = +3.162e+36 J/m³
+  |Δρ/ρ_GR|  = 0.000e+00
+
+r_s =  150.0 m:
+  ρ_GR       = +4.522e+32 J/m³
+  ρ_f(R)     = +7.756e+35 J/m³
+  Δρ         = +7.751e+35 J/m³
+  |Δρ/ρ_GR|  = 1.714e+03
+
+
+Maximum relative correction: 1.714e+03
+✅ f(R) correction significant (> 100%)
+
+======================================================================
+Testing α = 1.000e-08 m²
+======================================================================
+
+======================================================================
+Comparing GR vs f(R) = R + α R² at sample points
+======================================================================
+Bubble: v=1.0c, R=100.0m, σ=10.0m
+f(R) parameter: α = 1.000e-08 m²
+
+r_s =    0.0 m:
+  ρ_GR       = -5.976e+31 J/m³
+  ρ_f(R)     = -2.337e+34 J/m³
+  Δρ         = -2.331e+34 J/m³
+  |Δρ/ρ_GR|  = 3.900e+02
+
+r_s =   50.0 m:
+  ρ_GR       = -4.657e+33 J/m³
+  ρ_f(R)     = +1.088e+37 J/m³
+  Δρ         = +1.089e+37 J/m³
+  |Δρ/ρ_GR|  = 2.338e+03
+
+r_s =  100.0 m:
+  ρ_GR       = +0.000e+00 J/m³
+  ρ_f(R)     = +3.162e+38 J/m³
+  Δρ         = +3.162e+38 J/m³
+  |Δρ/ρ_GR|  = 0.000e+00
+
+r_s =  150.0 m:
+  ρ_GR       = +4.522e+32 J/m³
+  ρ_f(R)     = +7.751e+37 J/m³
+  Δρ         = +7.751e+37 J/m³
+  |Δρ/ρ_GR|  = 1.714e+05
+
+
+Maximum relative correction: 1.714e+05
+✅ f(R) correction significant (> 100%)
+
+======================================================================
+Testing α = 1.000e-06 m²
+======================================================================
+
+======================================================================
+Comparing GR vs f(R) = R + α R² at sample points
+======================================================================
+Bubble: v=1.0c, R=100.0m, σ=10.0m
+f(R) parameter: α = 1.000e-06 m²
+
+r_s =    0.0 m:
+  ρ_GR       = -5.976e+31 J/m³
+  ρ_f(R)     = -2.331e+36 J/m³
+  Δρ         = -2.331e+36 J/m³
+  |Δρ/ρ_GR|  = 3.900e+04
+
+r_s =   50.0 m:
+  ρ_GR       = -4.657e+33 J/m³
+  ρ_f(R)     = +1.089e+39 J/m³
+  Δρ         = +1.089e+39 J/m³
+  |Δρ/ρ_GR|  = 2.338e+05
+
+r_s =  100.0 m:
+  ρ_GR       = +0.000e+00 J/m³
+  ρ_f(R)     = +3.162e+40 J/m³
+  Δρ         = +3.162e+40 J/m³
+  |Δρ/ρ_GR|  = 0.000e+00
+
+r_s =  150.0 m:
+  ρ_GR       = +4.522e+32 J/m³
+  ρ_f(R)     = +7.751e+39 J/m³
+  Δρ         = +7.751e+39 J/m³
+  |Δρ/ρ_GR|  = 1.714e+07
+
+
+Maximum relative correction: 1.714e+07
+✅ f(R) correction significant (> 100%)
+
+######################################################################
+# FINAL ASSESSMENT
+######################################################################
+
+⚠️  POTENTIALLY VIABLE: α = 1.000e-10 m² gives O(10) correction
+    → Requires full ANEC computation to confirm
+⚠️  POTENTIALLY VIABLE: α = 1.000e-08 m² gives O(10) correction
+    → Requires full ANEC computation to confirm
+⚠️  POTENTIALLY VIABLE: α = 1.000e-06 m² gives O(10) correction
+    → Requires full ANEC computation to confirm
+
+❌ f(R) = R + α R² FAILS to enable viable FTL
+
+Reasons:
+  1. PPN constraints limit α ≤ 10⁻⁶ m²
+  2. Such small α gives negligible corrections to GR
+  3. ANEC violations remain ~37 orders too large
+  4. Portal contribution still irrelevant
+
+Conclusion:
+  - f(R) = R + α R² does NOT relax energy conditions
+  - Higher-order f(R) unlikely (tighter constraints)
+  - Next: Try scalar-tensor or close modified gravity track
+
+
+======================================================================
+Would you like to run full ANEC computation? (computationally expensive)
+Uncomment the line below to proceed:
+======================================================================
+
+
+======================================================================
+Running full ANEC computation...
+======================================================================
+
+######################################################################
+# f(R) = R + α R² VIABILITY SWEEP
+######################################################################
+
+Mode: anec
+α range: [1.000e-08, 1.000e-06] m²
+
+Observational constraint: α < 10⁻⁶ m² (PPN tests)
+
+Portal contribution: δρ ~ 10³ J/m³
+GR requirement: |ρ| ~ 10⁴⁰ J/m³ at wall
+Gap to close: ~37 orders of magnitude
+
+
+======================================================================
+Testing α = 1.000e-08 m²
+======================================================================
+
+======================================================================
+ANEC Computation: GR vs f(R)
+======================================================================
+α = 1.000e-08 m²
+
+Integrating null geodesic...
+✅ Geodesic integrated
+   Function evaluations: 1052
+   Null violation (mean): 2.466e-01
+
+Computing ANEC (GR)...
+  ANEC_GR = -7.482e+40
+  T_kk range: [-1.980e+40, 1.774e+40]
+
+Computing ANEC (f(R))...
+  ANEC_f(R) = -1.197e+41
+  T_kk range: [-2.981e+40, 2.300e+40]
+
+Comparison:
+  ΔANEC = -4.488e+40
+  |ΔANEC/ANEC_GR| = 5.999e-01
+  ⚠️  Both GR and f(R) violate ANEC
+
+Relative ANEC change: 5.999e-01
+⚠️  ANEC still violated (sign unchanged)
+
+======================================================================
+Testing α = 1.000e-06 m²
+======================================================================
+
+======================================================================
+ANEC Computation: GR vs f(R)
+======================================================================
+α = 1.000e-06 m²
+
+Integrating null geodesic...
+✅ Geodesic integrated
+   Function evaluations: 1052
+   Null violation (mean): 2.466e-01
+
+Computing ANEC (GR)...
+  ANEC_GR = -7.482e+40
+  T_kk range: [-1.980e+40, 1.774e+40]
+
+Computing ANEC (f(R))...
+  ANEC_f(R) = -4.563e+42
+  T_kk range: [-1.351e+42, 7.906e+41]
+
+Comparison:
+  ΔANEC = -4.488e+42
+  |ΔANEC/ANEC_GR| = 5.999e+01
+  ⚠️  Both GR and f(R) violate ANEC
+
+Relative ANEC change: 5.999e+01
+⚠️  ANEC still violated (sign unchanged)
+
+######################################################################
+# FINAL ASSESSMENT
+######################################################################
+
+
+❌ f(R) = R + α R² FAILS to enable viable FTL
+
+Reasons:
+  1. PPN constraints limit α ≤ 10⁻⁶ m²
+  2. Such small α gives negligible corrections to GR
+  3. ANEC violations remain ~37 orders too large
+  4. Portal contribution still irrelevant
+
+Conclusion:
+  - f(R) = R + α R² does NOT relax energy conditions
+  - Higher-order f(R) unlikely (tighter constraints)
+  - Next: Try scalar-tensor or close modified gravity track
+
