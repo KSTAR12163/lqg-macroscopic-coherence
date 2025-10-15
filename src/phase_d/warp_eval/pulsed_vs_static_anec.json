@@ -1,0 +1,49 @@
+{
+  "params": {
+    "v_s": 1.0,
+    "R": 100.0,
+    "sigma": 10.0,
+    "lambda_max": 400.0,
+    "n_steps": 180,
+    "t0": 0.0,
+    "t1": 50.0
+  },
+  "static": {
+    "diag": {
+      "success": true,
+      "message": "The solver successfully reached the end of the integration interval.",
+      "n_eval": 704,
+      "null_violation_max": 4.440963711075774e-16,
+      "null_violation_mean": 8.511770028199473e-17,
+      "null_violation_std": 1.2279551462894023e-16
+    },
+    "anec": 2.6842404586025176e+40,
+    "stats": {
+      "T_kk_min": -2.0732569526335486e+39,
+      "T_kk_max": 2.734975702987023e+39,
+      "T_kk_mean": 6.673320029025711e+37,
+      "T_kk_std": 8.547925855388243e+38,
+      "negative_fraction": 0.4666666666666667
+    }
+  },
+  "pulsed": {
+    "diag": {
+      "success": true,
+      "message": "The solver successfully reached the end of the integration interval.",
+      "n_eval": 728,
+      "null_violation_max": 4.441007465422078e-16,
+      "null_violation_mean": 6.291435628422572e-17,
+      "null_violation_std": 1.0408149829570768e-16
+    },
+    "anec": 2.683268017215934e+40,
+    "stats": {
+      "T_kk_min": -2.0664119518610012e+39,
+      "T_kk_max": 2.7351725110462664e+39,
+      "T_kk_mean": 6.670902431669606e+37,
+      "T_kk_std": 8.543466104464383e+38,
+      "negative_fraction": 0.4722222222222222
+    }
+  },
+  "delta_anec": -9.724413865834334e+36,
+  "rel_change": 0.00036227804534684293
+}
