@@ -165,11 +165,16 @@ def alcubierre_christoffel_analytic(
     v_df_dz = v_s * df_dz
     
     # Inverse metric (2×2 block for t-x subspace)
-    det_tx = -1.0  # det([[g_00, g_01], [g_10, g_11]]) = g_00 * g_11 - g_01²
+    # det([[g_00, g_01], [g_10, g_11]]) = g_00 * g_11 - g_01² = -1
+    # Inverse should be:
+    #   g^00 = -1,
+    #   g^01 = g^10 = -v_f,
+    #   g^11 = 1 - v_f^2
+    det_tx = -1.0
     g_inv = np.zeros((4, 4))
-    g_inv[0, 0] = 1.0 / det_tx  # = -1
-    g_inv[0, 1] = g_inv[1, 0] = -v_f / det_tx  # = v_f
-    g_inv[1, 1] = (-1.0 + v_f**2) / det_tx  # = 1 - v_f²
+    g_inv[0, 0] = -1.0
+    g_inv[0, 1] = g_inv[1, 0] = -v_f
+    g_inv[1, 1] = 1.0 - v_f**2
     g_inv[2, 2] = 1.0
     g_inv[3, 3] = 1.0
     
