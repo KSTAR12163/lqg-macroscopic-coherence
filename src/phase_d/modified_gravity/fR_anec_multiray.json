@@ -1,0 +1,168 @@
+{
+  "params": {
+    "v_s": 1.0,
+    "R": 100.0,
+    "sigma": 10.0,
+    "lambda_max": 400.0,
+    "n_steps": 160
+  },
+  "impact_params_y": [
+    -20.0,
+    -10.0,
+    0.0,
+    10.0,
+    20.0
+  ],
+  "rays": [
+    {
+      "y0": -20.0,
+      "success": true,
+      "diag": {
+        "success": true,
+        "message": "The solver successfully reached the end of the integration interval.",
+        "n_eval": 1178,
+        "null_violation_max": 1.7763568394002505e-15,
+        "null_violation_mean": 1.0408340855860843e-16,
+        "null_violation_std": 2.363913224642471e-16
+      },
+      "anec_GR": 2.024550218893379e+40,
+      "alpha_results": [
+        {
+          "alpha": 1e-10,
+          "anec_fR": 1.8438017965272227e+40,
+          "rel_change": 0.08927831015471359
+        },
+        {
+          "alpha": 1e-08,
+          "anec_fR": -1.6050292017722362e+41,
+          "rel_change": 8.92783101547141
+        },
+        {
+          "alpha": 1e-06,
+          "anec_fR": -1.8054596734426804e+43,
+          "rel_change": 892.7831015471407
+        }
+      ]
+    },
+    {
+      "y0": -10.0,
+      "success": true,
+      "diag": {
+        "success": true,
+        "message": "The solver successfully reached the end of the integration interval.",
+        "n_eval": 1172,
+        "null_violation_max": 2.6645352591003757e-15,
+        "null_violation_mean": 1.061650767297806e-16,
+        "null_violation_std": 2.9461386466213335e-16
+      },
+      "anec_GR": 3.7376616263746806e+40,
+      "alpha_results": [
+        {
+          "alpha": 1e-10,
+          "anec_fR": 3.7770142730735867e+40,
+          "rel_change": 0.010528680932809826
+        },
+        {
+          "alpha": 1e-08,
+          "anec_fR": 7.672926296265422e+40,
+          "rel_change": 1.0528680932810186
+        },
+        {
+          "alpha": 1e-06,
+          "anec_fR": 3.972641286154488e+42,
+          "rel_change": 105.28680932810187
+        }
+      ]
+    },
+    {
+      "y0": 0.0,
+      "success": true,
+      "diag": {
+        "success": true,
+        "message": "The solver successfully reached the end of the integration interval.",
+        "n_eval": 1172,
+        "null_violation_max": 8.881784197001252e-16,
+        "null_violation_mean": 1.0477729794899915e-16,
+        "null_violation_std": 1.8711740941578327e-16
+      },
+      "anec_GR": 4.1087682440747084e+40,
+      "alpha_results": [
+        {
+          "alpha": 1e-10,
+          "anec_fR": 4.121334920940817e+40,
+          "rel_change": 0.0030585022370709343
+        },
+        {
+          "alpha": 1e-08,
+          "anec_fR": 5.365435930685651e+40,
+          "rel_change": 0.3058502237071157
+        },
+        {
+          "alpha": 1e-06,
+          "anec_fR": 1.2977553690516891e+42,
+          "rel_change": 30.585022370711556
+        }
+      ]
+    },
+    {
+      "y0": 10.0,
+      "success": true,
+      "diag": {
+        "success": true,
+        "message": "The solver successfully reached the end of the integration interval.",
+        "n_eval": 1172,
+        "null_violation_max": 2.6645352591003757e-15,
+        "null_violation_mean": 1.061650767297806e-16,
+        "null_violation_std": 2.9461386466213335e-16
+      },
+      "anec_GR": 3.736081335116424e+40,
+      "alpha_results": [
+        {
+          "alpha": 1e-10,
+          "anec_fR": 3.7760454819118526e+40,
+          "rel_change": 0.010696808557082191
+        },
+        {
+          "alpha": 1e-08,
+          "anec_fR": 7.732496014659354e+40,
+          "rel_change": 1.0696808557082425
+        },
+        {
+          "alpha": 1e-06,
+          "anec_fR": 4.033775492894097e+42,
+          "rel_change": 106.96808557082433
+        }
+      ]
+    },
+    {
+      "y0": 20.0,
+      "success": true,
+      "diag": {
+        "success": true,
+        "message": "The solver successfully reached the end of the integration interval.",
+        "n_eval": 1178,
+        "null_violation_max": 1.7763568394002505e-15,
+        "null_violation_mean": 1.0408340855860843e-16,
+        "null_violation_std": 2.363913224642471e-16
+      },
+      "anec_GR": 2.014681078778434e+40,
+      "alpha_results": [
+        {
+          "alpha": 1e-10,
+          "anec_fR": 1.8525076504752578e+40,
+          "rel_change": 0.08049583133103487
+        },
+        {
+          "alpha": 1e-08,
+          "anec_fR": -1.4202661751539367e+41,
+          "rel_change": 8.049583133103576
+        },
+        {
+          "alpha": 1e-06,
+          "anec_fR": -1.6197196019530018e+43,
+          "rel_change": 804.9583133103578
+        }
+      ]
+    }
+  ]
+}
