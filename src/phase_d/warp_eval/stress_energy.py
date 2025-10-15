@@ -11,47 +11,241 @@ from typing import Dict, Callable, Tuple
 import numpy as np
 
 
-def compute_einstein_tensor(
-    metric: Callable,
+def compute_metric_derivatives(
+    metric_fn: Callable,
     coords: np.ndarray,
     dx: float = 1e-6
 ) -> np.ndarray:
     """
-    Compute Einstein tensor G_μν = R_μν - (1/2) R g_μν numerically.
-    
-    Uses finite differences for derivatives.
+    Compute first derivatives ∂_μ g_αβ using 4th-order central differences.
     
     Args:
-        metric: Function(x, y, z, t) → g_μν (4×4 array)
-        coords: Coordinates (t, x, y, z) at evaluation point
+        metric_fn: Function(t, x, y, z) → g_μν
+        coords: (t, x, y, z) evaluation point
         dx: Finite difference step
+        
+    Returns:
+        dg[μ][α][β] = ∂_μ g_αβ (4×4×4 array)
+    """
+    dg = np.zeros((4, 4, 4))
+    t, x, y, z = coords
+    
+    # 4th order central difference: f'(x) ≈ [−f(x+2h) + 8f(x+h) − 8f(x−h) + f(x−2h)] / 12h
+    coord_shifts = [
+        [1, 0, 0, 0],  # ∂_t
+        [0, 1, 0, 0],  # ∂_x
+        [0, 0, 1, 0],  # ∂_y
+        [0, 0, 0, 1],  # ∂_z
+    ]
+    
+    for mu, shift in enumerate(coord_shifts):
+        c_p2 = coords + 2 * dx * np.array(shift)
+        c_p1 = coords + dx * np.array(shift)
+        c_m1 = coords - dx * np.array(shift)
+        c_m2 = coords - 2 * dx * np.array(shift)
+        
+        g_p2 = metric_fn(*c_p2)
+        g_p1 = metric_fn(*c_p1)
+        g_m1 = metric_fn(*c_m1)
+        g_m2 = metric_fn(*c_m2)
+        
+        dg[mu] = (-g_p2 + 8*g_p1 - 8*g_m1 + g_m2) / (12 * dx)
+    
+    return dg
+
+
+def compute_christoffel_symbols(
+    g: np.ndarray,
+    dg: np.ndarray
+) -> np.ndarray:
+    """
+    Compute Christoffel symbols Γ^λ_μν = (1/2) g^λσ (∂_μ g_σν + ∂_ν g_μσ - ∂_σ g_μν).
+    
+    Args:
+        g: Metric tensor g_μν (4×4)
+        dg: Metric derivatives ∂_μ g_αβ (4×4×4)
+        
+    Returns:
+        Γ^λ_μν (4×4×4 array)
+    """
+    try:
+        g_inv = np.linalg.inv(g)
+    except np.linalg.LinAlgError:
+        # Singular metric - return zeros
+        return np.zeros((4, 4, 4))
+    
+    Gamma = np.zeros((4, 4, 4))
+    
+    for lam in range(4):
+        for mu in range(4):
+            for nu in range(4):
+                for sigma in range(4):
+                    Gamma[lam, mu, nu] += 0.5 * g_inv[lam, sigma] * (
+                        dg[mu, sigma, nu] + dg[nu, mu, sigma] - dg[sigma, mu, nu]
+                    )
+    
+    return Gamma
+
+
+def compute_riemann_tensor(
+    Gamma: np.ndarray,
+    dGamma: np.ndarray
+) -> np.ndarray:
+    """
+    Compute Riemann tensor R^ρ_σμν = ∂_μ Γ^ρ_νσ - ∂_ν Γ^ρ_μσ + Γ^ρ_μλ Γ^λ_νσ - Γ^ρ_νλ Γ^λ_μσ.
+    
+    Args:
+        Gamma: Christoffel symbols Γ^λ_μν (4×4×4)
+        dGamma: Derivatives ∂_μ Γ^λ_αβ (4×4×4×4)
+        
+    Returns:
+        R^ρ_σμν (4×4×4×4 array)
+    """
+    R = np.zeros((4, 4, 4, 4))
+    
+    for rho in range(4):
+        for sigma in range(4):
+            for mu in range(4):
+                for nu in range(4):
+                    # Derivative terms
+                    R[rho, sigma, mu, nu] = dGamma[mu, rho, nu, sigma] - dGamma[nu, rho, mu, sigma]
+                    
+                    # Quadratic terms
+                    for lam in range(4):
+                        R[rho, sigma, mu, nu] += (
+                            Gamma[rho, mu, lam] * Gamma[lam, nu, sigma] -
+                            Gamma[rho, nu, lam] * Gamma[lam, mu, sigma]
+                        )
+    
+    return R
+
+
+def compute_ricci_tensor(
+    R: np.ndarray
+) -> np.ndarray:
+    """
+    Compute Ricci tensor R_μν = R^λ_μλν (contraction of Riemann tensor).
+    
+    Args:
+        R: Riemann tensor R^ρ_σμν (4×4×4×4)
+        
+    Returns:
+        R_μν (4×4 array)
+    """
+    Ric = np.zeros((4, 4))
+    
+    for mu in range(4):
+        for nu in range(4):
+            for lam in range(4):
+                Ric[mu, nu] += R[lam, mu, lam, nu]
+    
+    return Ric
+
+
+def compute_ricci_scalar(
+    g_inv: np.ndarray,
+    Ric: np.ndarray
+) -> float:
+    """
+    Compute Ricci scalar R = g^μν R_μν.
+    
+    Args:
+        g_inv: Inverse metric g^μν (4×4)
+        Ric: Ricci tensor R_μν (4×4)
+        
+    Returns:
+        R (scalar)
+    """
+    R_scalar = 0.0
+    for mu in range(4):
+        for nu in range(4):
+            R_scalar += g_inv[mu, nu] * Ric[mu, nu]
+    
+    return R_scalar
+
+
+def compute_einstein_tensor(
+    metric_fn: Callable,
+    coords: np.ndarray,
+    dx: float = 1e-5
+) -> np.ndarray:
+    """
+    Compute Einstein tensor G_μν = R_μν - (1/2) R g_μν numerically.
+    
+    Uses 4th-order finite differences for derivatives.
+    
+    Args:
+        metric_fn: Function(t, x, y, z) → g_μν (4×4 array)
+        coords: Coordinates (t, x, y, z) at evaluation point
+        dx: Finite difference step (default 1e-5 m for stability)
         
     Returns:
         G_μν as 4×4 array
     """
-    # TODO: Implement proper numerical differentiation
-    # For now, return placeholder
+    # Metric at evaluation point
+    g = metric_fn(*coords)
     
-    G_munu = np.zeros((4, 4))
+    # Inverse metric
+    try:
+        g_inv = np.linalg.inv(g)
+    except np.linalg.LinAlgError:
+        # Singular metric - return zeros
+        return np.zeros((4, 4))
     
-    # Placeholder: Alcubierre-style stress-energy
-    # Negative energy density in wall region
-    t, x, y, z = coords
-    r = np.sqrt(x**2 + y**2 + z**2)
+    # First derivatives of metric
+    dg = compute_metric_derivatives(metric_fn, coords, dx)
     
-    # Schematic wall profile
-    wall_center = 100.0  # m
-    wall_width = 10.0  # m
+    # Christoffel symbols
+    Gamma = compute_christoffel_symbols(g, dg)
     
-    wall_factor = np.exp(-((r - wall_center) / wall_width)**2)
+    # Derivatives of Christoffel symbols (for Riemann tensor)
+    dGamma = np.zeros((4, 4, 4, 4))
+    coord_shifts = [
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+    ]
     
-    # Placeholder components (proper calculation needs full Christoffel symbols)
-    G_munu[0, 0] = -1e10 * wall_factor  # T_tt (energy density)
-    G_munu[1, 1] = 1e10 * wall_factor   # T_xx (pressure)
-    G_munu[2, 2] = 1e10 * wall_factor   # T_yy
-    G_munu[3, 3] = 1e10 * wall_factor   # T_zz
+    for mu, shift in enumerate(coord_shifts):
+        c_p2 = coords + 2 * dx * np.array(shift)
+        c_p1 = coords + dx * np.array(shift)
+        c_m1 = coords - dx * np.array(shift)
+        c_m2 = coords - 2 * dx * np.array(shift)
+        
+        # Compute Gamma at shifted points
+        g_p2 = metric_fn(*c_p2)
+        dg_p2 = compute_metric_derivatives(metric_fn, c_p2, dx)
+        Gamma_p2 = compute_christoffel_symbols(g_p2, dg_p2)
+        
+        g_p1 = metric_fn(*c_p1)
+        dg_p1 = compute_metric_derivatives(metric_fn, c_p1, dx)
+        Gamma_p1 = compute_christoffel_symbols(g_p1, dg_p1)
+        
+        g_m1 = metric_fn(*c_m1)
+        dg_m1 = compute_metric_derivatives(metric_fn, c_m1, dx)
+        Gamma_m1 = compute_christoffel_symbols(g_m1, dg_m1)
+        
+        g_m2 = metric_fn(*c_m2)
+        dg_m2 = compute_metric_derivatives(metric_fn, c_m2, dx)
+        Gamma_m2 = compute_christoffel_symbols(g_m2, dg_m2)
+        
+        # 4th order derivative
+        dGamma[mu] = (-Gamma_p2 + 8*Gamma_p1 - 8*Gamma_m1 + Gamma_m2) / (12 * dx)
     
-    return G_munu
+    # Riemann tensor
+    R = compute_riemann_tensor(Gamma, dGamma)
+    
+    # Ricci tensor
+    Ric = compute_ricci_tensor(R)
+    
+    # Ricci scalar
+    R_scalar = compute_ricci_scalar(g_inv, Ric)
+    
+    # Einstein tensor: G_μν = R_μν - (1/2) R g_μν
+    G = Ric - 0.5 * R_scalar * g
+    
+    return G
 
 
 def einstein_to_stress_energy(G_munu: np.ndarray) -> np.ndarray:
