@@ -352,6 +352,140 @@ class FRGravity:
         G_modified += self.alpha * modification
         
         return G_modified
+
+    def precompute_geometry_terms(
+        self,
+        metric_fn: Callable,
+        coords: np.ndarray,
+        dx: float = 1e-5
+    ) -> dict:
+        """
+        Precompute geometric terms needed for f(R) corrections at a point.
+
+        Returns a dict with:
+          - g: metric g_μν
+          - g_inv: inverse metric g^μν
+          - G_GR: Einstein tensor (GR)
+          - Ric: Ricci tensor R_μν
+          - R: Ricci scalar
+          - nabla_nabla_R: ∇_μ∇_ν R
+          - box_R: □R
+        """
+        import sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'warp_eval'))
+        from stress_energy import (
+            compute_einstein_tensor,
+            compute_metric_derivatives,
+            compute_christoffel_symbols,
+            compute_riemann_tensor,
+            compute_ricci_tensor,
+            compute_ricci_scalar,
+        )
+
+        g = metric_fn(*coords)
+        g_inv = np.linalg.inv(g)
+        G_GR = compute_einstein_tensor(metric_fn, coords, dx)
+
+        dg = compute_metric_derivatives(metric_fn, coords, dx)
+        Gamma = compute_christoffel_symbols(g, dg)
+
+        # Derivatives of Gamma
+        dGamma = np.zeros((4, 4, 4, 4))
+        for mu in range(4):
+            coords_p = coords.copy(); coords_p[mu] += dx
+            coords_m = coords.copy(); coords_m[mu] -= dx
+            g_p = metric_fn(*coords_p); g_m = metric_fn(*coords_m)
+            dg_p = compute_metric_derivatives(metric_fn, coords_p, dx)
+            dg_m = compute_metric_derivatives(metric_fn, coords_m, dx)
+            Gamma_p = compute_christoffel_symbols(g_p, dg_p)
+            Gamma_m = compute_christoffel_symbols(g_m, dg_m)
+            dGamma[mu] = (Gamma_p - Gamma_m) / (2 * dx)
+
+        R_tensor = compute_riemann_tensor(Gamma, dGamma)
+        Ric = compute_ricci_tensor(R_tensor)
+        R = compute_ricci_scalar(g_inv, Ric)
+
+        # Gradient and Hessian of R for □R and ∇∇R
+        # Compute ∇_μ R via finite diff of R
+        def R_at(c):
+            g_loc = metric_fn(*c)
+            dg_loc = compute_metric_derivatives(metric_fn, c, dx)
+            Gamma_loc = compute_christoffel_symbols(g_loc, dg_loc)
+            dGamma_loc = np.zeros((4, 4, 4, 4))
+            for nu in range(4):
+                c_p = c.copy(); c_p[nu] += dx
+                c_m = c.copy(); c_m[nu] -= dx
+                g_p2 = metric_fn(*c_p); g_m2 = metric_fn(*c_m)
+                dg_p2 = compute_metric_derivatives(metric_fn, c_p, dx)
+                dg_m2 = compute_metric_derivatives(metric_fn, c_m, dx)
+                Gamma_p2 = compute_christoffel_symbols(g_p2, dg_p2)
+                Gamma_m2 = compute_christoffel_symbols(g_m2, dg_m2)
+                dGamma_loc[nu] = (Gamma_p2 - Gamma_m2) / (2 * dx)
+            R_ten = compute_riemann_tensor(Gamma_loc, dGamma_loc)
+            Ric_loc = compute_ricci_tensor(R_ten)
+            g_inv_loc = np.linalg.inv(g_loc)
+            return compute_ricci_scalar(g_inv_loc, Ric_loc)
+
+        grad_R = np.zeros(4)
+        for mu in range(4):
+            c_p = coords.copy(); c_p[mu] += dx
+            c_m = coords.copy(); c_m[mu] -= dx
+            grad_R[mu] = (R_at(c_p) - R_at(c_m)) / (2 * dx)
+
+        nabla_nabla_R = np.zeros((4, 4))
+        for mu in range(4):
+            for nu in range(4):
+                # second partials
+                c_pp = coords.copy(); c_pp[mu] += dx; c_pp[nu] += dx
+                c_pm = coords.copy(); c_pm[mu] += dx; c_pm[nu] -= dx
+                c_mp = coords.copy(); c_mp[mu] -= dx; c_mp[nu] += dx
+                c_mm = coords.copy(); c_mm[mu] -= dx; c_mm[nu] -= dx
+                R_pp = R_at(c_pp); R_pm = R_at(c_pm)
+                R_mp = R_at(c_mp); R_mm = R_at(c_mm)
+                d2R = (R_pp - R_pm - R_mp + R_mm) / (4 * dx * dx)
+                # covariant correction
+                ch_term = 0.0
+                for lam in range(4):
+                    ch_term += Gamma[lam, mu, nu] * grad_R[lam]
+                nabla_nabla_R[mu, nu] = d2R - ch_term
+
+        box_R = float(np.sum(g_inv * nabla_nabla_R))
+
+        return {
+            'g': g,
+            'g_inv': g_inv,
+            'G_GR': G_GR,
+            'Ric': Ric,
+            'R': float(R),
+            'nabla_nabla_R': nabla_nabla_R,
+            'box_R': box_R,
+        }
+
+    def modified_einstein_from_precompute(self, pre: dict) -> np.ndarray:
+        """
+        Compute modified Einstein tensor using precomputed geometry.
+        """
+        G_GR = pre['G_GR']
+        g = pre['g']
+        Ric = pre['Ric']
+        R = pre['R']
+        nabla_nabla_R = pre['nabla_nabla_R']
+        box_R = pre['box_R']
+
+        modification = (
+            2 * R * Ric
+            - 0.5 * R**2 * g
+            - 2 * nabla_nabla_R
+            + 2 * box_R * g
+        )
+        return G_GR + self.alpha * modification
+
+    def effective_stress_energy_from_precompute(self, pre: dict) -> np.ndarray:
+        """
+        Compute effective stress-energy from precomputed geometry.
+        """
+        G_mod = self.modified_einstein_from_precompute(pre)
+        return (self.c**4 / (8 * np.pi * self.G_Newton)) * G_mod
     
     def _compute_R_at_point(
         self,

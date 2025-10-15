@@ -1,0 +1,35 @@
+{
+  "params": {
+    "v_s": 1.0,
+    "R": 100.0,
+    "sigma": 10.0,
+    "lambda_max": 400.0,
+    "n_steps": 180
+  },
+  "geodesic_diag": {
+    "success": true,
+    "message": "The solver successfully reached the end of the integration interval.",
+    "n_eval": 1172,
+    "null_violation_max": 3.552713678800501e-15,
+    "null_violation_mean": 1.3260997238578258e-16,
+    "null_violation_std": 4.0082608635047836e-16
+  },
+  "anec_GR": 4.1602337833452736e+40,
+  "alpha_results": [
+    {
+      "alpha": 1e-10,
+      "anec_fR": 4.137187609566795e+40,
+      "rel_change": 0.0055396343039037545
+    },
+    {
+      "alpha": 1e-08,
+      "anec_fR": 1.8556164054973106e+40,
+      "rel_change": 0.553963430390396
+    },
+    {
+      "alpha": 1e-06,
+      "anec_fR": -2.263015040014512e+42,
+      "rel_change": 55.39634303903964
+    }
+  ]
+}

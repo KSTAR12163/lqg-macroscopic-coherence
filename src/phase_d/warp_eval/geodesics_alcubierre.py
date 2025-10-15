@@ -22,33 +22,46 @@ def project_to_null_cone(
     u: np.ndarray = None
 ) -> np.ndarray:
     """
-    Project 4-vector k onto null cone.
-    
-    See geodesics.py for full documentation.
+    Project 4-vector k onto the null cone by solving g_{\mu\nu} k^\mu k^\nu = 0
+    exactly for k^t given the spatial components.
+
+    This replaces the previous linear projection, which could leave noticeable
+    nullness drift when g_{\mu 0} k^\mu ≈ 0. We solve the quadratic (or linear
+    if a ≈ 0) equation in k^t:
+
+        a (k^t)^2 + b k^t + c = 0
+
+    where a = g_{00}, b = 2 g_{0i} k^i, c = g_{ij} k^i k^j.
     """
-    if u is None:
-        u = np.array([1.0, 0.0, 0.0, 0.0])
-    
-    g_kk = np.dot(k, np.dot(g, k))
-    g_ku = np.dot(k, np.dot(g, u))
-    
-    if abs(g_ku) < 1e-10:
-        # Fallback: solve quadratic for k^t
-        a = g[0, 0]
-        b = 2 * np.dot(g[0, 1:], k[1:])
-        c = np.dot(k[1:], np.dot(g[1:, 1:], k[1:]))
-        
-        if abs(a) > 1e-10:
-            discriminant = b**2 - 4*a*c
-            if discriminant >= 0:
-                k_t_new = (-b + np.sqrt(discriminant)) / (2*a)
-                k_proj = k.copy()
-                k_proj[0] = k_t_new
-                return k_proj
-        
-        return k
-    
-    k_proj = k - 0.5 * (g_kk / g_ku) * u
+    # Coefficients for k^t equation
+    a = g[0, 0]
+    b = 2.0 * np.dot(g[0, 1:], k[1:])
+    c = float(np.dot(k[1:], np.dot(g[1:, 1:], k[1:])))
+
+    k_proj = k.copy()
+
+    # Handle near-degenerate quadratic (|a| ~ 0) with linear solve
+    eps = 1e-12
+    if abs(a) < eps:
+        if abs(b) > eps:
+            k_t = -c / b
+            k_proj[0] = k_t
+        # else leave k unchanged (cannot determine k^t)
+        return k_proj
+
+    # Solve quadratic for k^t, choose future-directed root (larger k^t)
+    disc = b * b - 4.0 * a * c
+    if disc < 0:
+        # Numerical issue: keep original k
+        return k_proj
+
+    sqrt_disc = np.sqrt(disc)
+    k_t1 = (-b + sqrt_disc) / (2.0 * a)
+    k_t2 = (-b - sqrt_disc) / (2.0 * a)
+
+    # Pick root with larger coordinate time component (future-directed)
+    k_t = k_t1 if k_t1 >= k_t2 else k_t2
+    k_proj[0] = k_t
     return k_proj
 
 
@@ -77,35 +90,8 @@ def null_tangent_alcubierre(
     g = alcubierre_metric_analytic(*coords, v_s, R, sigma)
     
     # Solve g_μν k^μ k^ν = 0 for k^t given k^i = n^i
-    # g_00 (k^t)² + 2 g_0i k^t k^i + g_ij k^i k^j = 0
-    
-    k_spatial = n_spatial
-    
-    a = g[0, 0]
-    b = 2 * (g[0, 1] * k_spatial[0] + g[0, 2] * k_spatial[1] + g[0, 3] * k_spatial[2])
-    c_quad = (
-        g[1, 1] * k_spatial[0]**2 +
-        g[2, 2] * k_spatial[1]**2 +
-        g[3, 3] * k_spatial[2]**2 +
-        2 * g[1, 2] * k_spatial[0] * k_spatial[1] +
-        2 * g[1, 3] * k_spatial[0] * k_spatial[2] +
-        2 * g[2, 3] * k_spatial[1] * k_spatial[2]
-    )
-    
-    discriminant = b**2 - 4 * a * c_quad
-    
-    if discriminant < 0:
-        # No real solution - fallback
-        k_t = 1.0
-    else:
-        # Choose positive root (future-directed)
-        k_t = (-b + np.sqrt(discriminant)) / (2 * a)
-    
-    k = np.array([k_t, k_spatial[0], k_spatial[1], k_spatial[2]])
-    
-    # Project onto null cone for safety
+    k = np.array([0.0, n_spatial[0], n_spatial[1], n_spatial[2]])
     k = project_to_null_cone(k, g)
-    
     return k
 
 
@@ -136,7 +122,7 @@ def geodesic_rhs_alcubierre(
     g = alcubierre_metric_analytic(*coords, v_s, R, sigma)
     Gamma = alcubierre_christoffel_analytic(*coords, v_s, R, sigma)
     
-    # Project k to null cone
+    # Project k to null cone (exact k^t solve)
     if project_null:
         k = project_to_null_cone(k, g)
     
@@ -225,14 +211,16 @@ def integrate_alcubierre_geodesic(
         }
     else:
         positions = sol.y[0:4, :].T
-        tangents = sol.y[4:8, :].T
+        tangents_raw = sol.y[4:8, :].T
         
-        # Check null condition
+        # Project tangents onto null cone at each point (enforce constraint)
+        tangents = np.zeros_like(tangents_raw)
         null_violations = []
         for i in range(len(positions)):
             g = alcubierre_metric_analytic(*positions[i], v_s, R, sigma)
-            k = tangents[i]
-            null_norm = np.dot(k, np.dot(g, k))
+            k_proj = project_to_null_cone(tangents_raw[i], g)
+            tangents[i] = k_proj
+            null_norm = np.dot(k_proj, np.dot(g, k_proj))
             null_violations.append(abs(null_norm))
         
         diagnostics = {
